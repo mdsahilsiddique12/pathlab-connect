@@ -1,10 +1,12 @@
-<<<<<<< HEAD
 {
   "name": "pathlab-connect",
   "version": "1.0.0",
   "scripts": {
     "dev": "netlify dev",
-    "build": "cd web && npm run build",
+    "build": "vite build",
+    "postinstall": "prisma generate",
+    "migrate:deploy": "prisma migrate deploy",
+    "migrate:dev": "prisma migrate dev",
     "deploy": "netlify deploy --prod"
   },
   "dependencies": {
@@ -17,23 +19,3 @@
     "prisma": "^6.16.2"
   }
 }
-=======
-{
-  "name": "pathlab-connect",
-  "version": "1.0.0",
-  "scripts": {
-    "dev": "netlify dev",
-    "build": "cd web && npm run build",
-    "deploy": "netlify deploy --prod"
-  },
-  "dependencies": {
-    "@prisma/client": "^6.16.2",
-    "bcryptjs": "^2.4.3",
-    "jsonwebtoken": "^9.0.2",
-    "nodemailer": "^6.10.1"
-  },
-  "devDependencies": {
-    "prisma": "^6.16.2"
-  }
-}
->>>>>>> f279ec02bad4c774ef37cf3e61de2db5cb9f969b
