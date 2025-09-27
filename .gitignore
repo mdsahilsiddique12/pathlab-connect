@@ -1,10 +1,8 @@
-<<<<<<< HEAD
 node_modules/ 
 .env 
 dev.db 
 *.log 
 .netlify/ 
-=======
 cat > .gitignore << 'EOF'
 # Dependencies
 node_modules/
@@ -78,4 +76,3 @@ dist/
 ehthumbs.db
 Thumbs.db
 EOF
->>>>>>> f279ec02bad4c774ef37cf3e61de2db5cb9f969b
