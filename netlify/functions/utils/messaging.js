@@ -68,12 +68,17 @@ const sendEmail = async (recipientEmail, subject, htmlContent, textContent) => {
     console.log('📧 Setting up email transporter...');
     
     try {
-        // Use your existing HTML template directly
         const templateParams = {
+            customer_name: messageData.customerName || 'Valued Customer',
+            customer_email: messageData.customerEmail,
+            customer_phone: messageData.customerPhone,
+            booking_id: messageData.bookingId,
+            selected_tests: messageData.selectedTests,
+            collection_date: messageData.collectionDate,
+            time_slot: messageData.timeSlot,
+            address: messageData.address,
             to_email: recipientEmail,
-            subject: subject,
-            html_content: htmlContent, // Your full HTML template goes here
-            from_name: 'PathLab Connect'
+            subject: subject
         };
 
         const response = await emailjs.send(
@@ -89,6 +94,7 @@ const sendEmail = async (recipientEmail, subject, htmlContent, textContent) => {
         return false;
     }
 };
+
 
 
 // Everything else stays the same - all WhatsApp code, templates, etc.
