@@ -63,18 +63,16 @@ emailjs.init({
     privateKey: process.env.EMAILJS_PRIVATE_KEY
 });
 
-console.log('🚀 Starting messaging service...');
-
 const sendEmail = async (recipientEmail, subject, htmlContent, textContent) => {
     console.log('📧 Sending REAL email to patient...');
     console.log('📧 Setting up email transporter...');
     
     try {
+        // Use your existing HTML template directly
         const templateParams = {
             to_email: recipientEmail,
-            customer_name: 'PathLab Customer',
             subject: subject,
-            email_content: htmlContent,
+            html_content: htmlContent, // Your full HTML template goes here
             from_name: 'PathLab Connect'
         };
 
@@ -91,6 +89,7 @@ const sendEmail = async (recipientEmail, subject, htmlContent, textContent) => {
         return false;
     }
 };
+
 
 // Everything else stays the same - all WhatsApp code, templates, etc.
 
