@@ -468,7 +468,8 @@ module.exports = {
     sendCustomerNotifications,
     sendAdminNotifications,
     sendWhatsAppMessage,
-    sendEmail
+    sendEmail,
+    sendNotifications: processBookingNotifications
 };
 
 console.log('✅ Messaging service loaded successfully');
