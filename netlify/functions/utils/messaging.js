@@ -3,7 +3,6 @@
 // Handles WhatsApp and Email notifications with professional templates
 // =======================================
 
-const { Resend } = require('resend'); // ✅ ONLY CHANGE: Using Resend
 console.log('🚀 Starting messaging service...');
 
 // Initialize Resend - ONLY CHANGE
@@ -15,6 +14,7 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 
 const sendWhatsAppMessage = async (recipientPhone, message) => {
     console.log(`📱 Sending WhatsApp to customer...`);
+    console.log(`📱 Phone format: ${recipientPhone}`)
     
     try {
         const whatsappData = {
@@ -51,29 +51,50 @@ const sendWhatsAppMessage = async (recipientPhone, message) => {
 };
 
 // =======================================
-// EMAIL SERVICE - ONLY EMAIL FUNCTION CHANGED
 // =======================================
+// EMAIL SERVICE WITH EMAILJS - NEW
+// =======================================
+
+const emailjs = require('@emailjs/nodejs');
+
+// Initialize EmailJS
+emailjs.init({
+    publicKey: process.env.EMAILJS_PUBLIC_KEY,
+    privateKey: process.env.EMAILJS_PRIVATE_KEY
+});
+
+console.log('🚀 Starting messaging service...');
 
 const sendEmail = async (recipientEmail, subject, htmlContent, textContent) => {
     console.log('📧 Sending REAL email to patient...');
     console.log('📧 Setting up email transporter...');
     
     try {
-        // ✅ ONLY CHANGE: Using Resend instead of nodemailer
-        const data = await resend.emails.send({
-            from: 'PathLab Connect <onboarding@resend.dev>',
-            to: recipientEmail,
+        const templateParams = {
+            to_email: recipientEmail,
+            customer_name: 'PathLab Customer',
             subject: subject,
-            html: htmlContent
-        });
+            email_content: htmlContent,
+            from_name: 'PathLab Connect'
+        };
 
-        console.log('✅ Email sent successfully:', data);
+        const response = await emailjs.send(
+            process.env.EMAILJS_SERVICE_ID,
+            process.env.EMAILJS_TEMPLATE_ID,
+            templateParams
+        );
+
+        console.log('✅ Email sent successfully:', response.status, response.text);
         return true;
     } catch (error) {
         console.error('❌ Email sending failed:', error);
         return false;
     }
 };
+
+// Everything else stays the same - all WhatsApp code, templates, etc.
+
+
 
 // =======================================
 // EMAIL TEMPLATES - COMPLETELY UNCHANGED
