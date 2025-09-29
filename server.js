@@ -12,7 +12,6 @@ const adminLogin = require('./netlify/functions/admin-login');
 const adminUpdateStatus = require('./netlify/functions/admin-update-status');
 const appointmentsCreate = require('./netlify/functions/appointments-create');
 const appointmentsTrack = require('./netlify/functions/appointments-track');
-const messaging = require('./netlify/functions/messaging');
 
 // Middleware
 app.use(cors({
@@ -78,7 +77,6 @@ app.post('/api/admin/login', netlifyToExpress(adminLogin));
 app.get('/api/admin/dashboard', netlifyToExpress(adminDashboard));
 app.get('/api/admin/appointments', netlifyToExpress(adminAppointments));
 app.post('/api/admin/update-status', netlifyToExpress(adminUpdateStatus));
-app.post('/api/messaging', netlifyToExpress(messaging));
 
 // Handle OPTIONS requests for CORS
 app.options('*', (req, res) => {
