@@ -7,11 +7,9 @@
   "scripts": {
     "start": "node server.js",
     "dev": "netlify dev",
-    "build": "vite build",
     "postinstall": "prisma generate",
     "migrate:deploy": "prisma migrate deploy",
-    "migrate:dev": "prisma migrate dev",
-    "deploy": "netlify deploy --prod"
+    "migrate:dev": "prisma migrate dev"
   },
   "dependencies": {
     "@prisma/client": "^6.16.2",
@@ -23,6 +21,5 @@
   },
   "devDependencies": {
     "prisma": "^6.16.2"
-    "vite": "^4.4.5"
   }
 }
