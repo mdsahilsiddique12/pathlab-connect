@@ -179,8 +179,8 @@
           const result = await response.json();
 
           if (result.success) {
-            sessionStorage.setItem('adminToken', result.data.token);
-            onLogin(result.data.user);
+              sessionStorage.setItem('adminSessionId', result.sessionId); // Use sessionId from login response
+              setUser(result.user);
           } else {
             setError(result.message || 'Login failed');
           }
@@ -775,7 +775,7 @@
       const [isLoading, setIsLoading] = useState(true);
 
       useEffect(() => {
-        const token = sessionStorage.getItem('adminToken');
+        const token = sessionStorage.getItem('adminSessionId');
         if (token) {
           checkUser();
         } else {
@@ -788,19 +788,17 @@
           setUser({ name: 'Admin', email: 'admin@pathlab.com' });
           await loadAppointments();
         } catch (error) {
-          sessionStorage.removeItem('adminToken');
+          sessionStorage.removeItem('adminSessionId');
         }
         setIsLoading(false);
       };
 
       const loadAppointments = async () => {
           try {
-              const token = sessionStorage.getItem('adminToken');
+              const sessionId = sessionStorage.getItem('adminSessionId'); // New session approach
               const response = await fetch('/api/admin/appointments', {
-                  method: 'GET',
                   headers: {
-                      'Content-Type': 'application/json',
-                      'Authorization': `Bearer ${token}`
+                      'X-Session-ID': sessionId // Session header
                   }
               });
 
@@ -927,13 +925,13 @@
       };
 
       const handleLogout = () => {
-        sessionStorage.removeItem('adminToken');
+        sessionStorage.removeItem('adminSessionId');
         setUser(null);
       };
 
       const handleStatusUpdate = async (appointmentId, newStatus, adminNotes) => {
           try {
-              const token = sessionStorage.getItem('adminToken');
+              const token = sessionStorage.getItem('adminSessionId');
               
               // 🚀 CALL BACKEND API FIRST
               const response = await fetch('/api/admin/update-status', {
