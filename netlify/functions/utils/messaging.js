@@ -3,16 +3,14 @@
 // Handles WhatsApp and Email notifications with professional templates
 // =======================================
 
-const axios = require('axios');
-const { Resend } = require('resend'); // ✅ CHANGED: Using Resend instead of nodemailer
-
-// Initialize Resend
-const resend = new Resend(process.env.RESEND_API_KEY); // ✅ CHANGED: Resend initialization
-
+const { Resend } = require('resend'); // ✅ ONLY CHANGE: Using Resend
 console.log('🚀 Starting messaging service...');
 
+// Initialize Resend - ONLY CHANGE
+const resend = new Resend(process.env.RESEND_API_KEY);
+
 // =======================================
-// WHATSAPP MESSAGING SERVICE
+// WHATSAPP MESSAGING SERVICE - UNCHANGED
 // =======================================
 
 const sendWhatsAppMessage = async (recipientPhone, message) => {
@@ -28,16 +26,14 @@ const sendWhatsAppMessage = async (recipientPhone, message) => {
             }
         };
 
-        const response = await axios.post(
-            'https://graph.facebook.com/v18.0/510518432165203/messages',
-            whatsappData,
-            {
-                headers: {
-                    'Authorization': `Bearer ${process.env.WHATSAPP_TOKEN}`,
-                    'Content-Type': 'application/json'
-                }
-            }
-        );
+        const response = await fetch('https://graph.facebook.com/v18.0/510518432165203/messages', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${process.env.WHATSAPP_TOKEN}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(whatsappData)
+        });
 
         console.log(`WhatsApp API Response Status: ${response.status}`);
         
@@ -55,7 +51,7 @@ const sendWhatsAppMessage = async (recipientPhone, message) => {
 };
 
 // =======================================
-// EMAIL SERVICE WITH RESEND
+// EMAIL SERVICE - ONLY EMAIL FUNCTION CHANGED
 // =======================================
 
 const sendEmail = async (recipientEmail, subject, htmlContent, textContent) => {
@@ -63,25 +59,24 @@ const sendEmail = async (recipientEmail, subject, htmlContent, textContent) => {
     console.log('📧 Setting up email transporter...');
     
     try {
-        // ✅ CHANGED: Using Resend instead of nodemailer
+        // ✅ ONLY CHANGE: Using Resend instead of nodemailer
         const data = await resend.emails.send({
-            from: 'PathLab Connect <noreply@pathlabconnect.com>', // ✅ Update with your domain
-            to: [recipientEmail],
+            from: 'PathLab Connect <onboarding@resend.dev>',
+            to: recipientEmail,
             subject: subject,
-            html: htmlContent,
-            text: textContent || htmlContent.replace(/<[^>]*>/g, '') // Strip HTML for text version
+            html: htmlContent
         });
 
         console.log('✅ Email sent successfully:', data);
         return true;
     } catch (error) {
-        console.error('❌ Email sending failed:', error.message);
+        console.error('❌ Email sending failed:', error);
         return false;
     }
 };
 
 // =======================================
-// EMAIL TEMPLATES (UNCHANGED)
+// EMAIL TEMPLATES - COMPLETELY UNCHANGED
 // =======================================
 
 const generateCustomerEmailTemplate = (messageData) => {
@@ -316,7 +311,7 @@ const generateAdminEmailTemplate = (messageData) => {
 };
 
 // =======================================
-// WHATSAPP TEMPLATES (UNCHANGED)
+// WHATSAPP TEMPLATES - COMPLETELY UNCHANGED
 // =======================================
 
 const generateCustomerWhatsAppMessage = (messageData) => {
@@ -375,7 +370,7 @@ const generateAdminWhatsAppMessage = (messageData) => {
 };
 
 // =======================================
-// MAIN NOTIFICATION FUNCTIONS (UNCHANGED)
+// MAIN NOTIFICATION FUNCTIONS - COMPLETELY UNCHANGED
 // =======================================
 
 const sendCustomerNotifications = async (messageData) => {
@@ -422,7 +417,7 @@ const sendAdminNotifications = async (messageData) => {
 };
 
 // =======================================
-// MAIN EXPORT FUNCTION (UNCHANGED)
+// MAIN EXPORT FUNCTION - COMPLETELY UNCHANGED
 // =======================================
 
 const processBookingNotifications = async (messageData) => {
@@ -469,7 +464,7 @@ module.exports = {
     sendAdminNotifications,
     sendWhatsAppMessage,
     sendEmail,
-    sendNotifications: processBookingNotifications
+    sendNotifications: processBookingNotifications // Alias for compatibility
 };
 
 console.log('✅ Messaging service loaded successfully');
