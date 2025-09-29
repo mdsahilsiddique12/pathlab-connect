@@ -932,19 +932,50 @@
       };
 
       const handleStatusUpdate = async (appointmentId, newStatus, adminNotes) => {
-        const updatedAppointments = appointments.map(apt =>
-          apt.id === appointmentId
-            ? { ...apt, status: newStatus, admin_notes: adminNotes }
-            : apt
-        );
-        
-        setAppointments(updatedAppointments);
-        setSelectedAppointment(prev => 
-          prev?.id === appointmentId 
-            ? { ...prev, status: newStatus, admin_notes: adminNotes }
-            : prev
-        );
+          try {
+              const token = localStorage.getItem('adminToken');
+              
+              // 🚀 CALL BACKEND API FIRST
+              const response = await fetch('/api/admin/update-status', {
+                  method: 'POST',
+                  headers: {
+                      'Content-Type': 'application/json',
+                      'Authorization': `Bearer ${token}`
+                  },
+                  body: JSON.stringify({
+                      appointmentId: appointmentId,
+                      status: newStatus,
+                      notes: adminNotes
+                  })
+              });
+              
+              const result = await response.json();
+              
+              if (response.ok && result.success) {
+                  // ✅ UPDATE UI AFTER SUCCESSFUL API CALL
+                  const updatedAppointments = appointments.map(apt =>
+                    apt.id === appointmentId
+                      ? { ...apt, status: newStatus, admin_notes: adminNotes }
+                      : apt
+                  );
+                  
+                  setAppointments(updatedAppointments);
+                  setSelectedAppointment(prev => 
+                    prev?.id === appointmentId 
+                      ? { ...prev, status: newStatus, admin_notes: adminNotes }
+                      : prev
+                  );
+                  
+                  alert('✅ Status updated successfully!');
+              } else {
+                  alert('❌ Failed to update status: ' + result.message);
+              }
+          } catch (error) {
+              console.error('Status update error:', error);
+              alert('❌ Error updating status');
+          }
       };
+
 
       if (isLoading) {
         return (
