@@ -29,7 +29,7 @@ try {
   
   // Only import messaging if it exists
   try {
-    messaging = require('./netlify/functions/messaging');
+    messaging = require('./netlify/functions/utile/messaging');
   } catch (e) {
     console.log('⚠️ Messaging function not found, skipping');
   }
