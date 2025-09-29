@@ -1,13 +1,13 @@
 {
   "name": "pathlab-connect",
   "version": "1.0.0",
+  "engines": { "node": ">=18" },
   "scripts": {
-    "dev": "netlify dev",
+    "start": "node index.js",
     "build": "vite build",
     "postinstall": "prisma generate",
     "migrate:deploy": "prisma migrate deploy",
-    "migrate:dev": "prisma migrate dev",
-    "deploy": "netlify deploy --prod"
+    "migrate:dev": "prisma migrate dev"
   },
   "dependencies": {
     "@prisma/client": "^6.16.2",
