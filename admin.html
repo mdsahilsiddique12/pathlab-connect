@@ -179,7 +179,7 @@
           const result = await response.json();
 
           if (result.success) {
-            localStorage.setItem('adminToken', result.data.token);
+            sessionStorage.setItem('adminToken', result.data.token);
             onLogin(result.data.user);
           } else {
             setError(result.message || 'Login failed');
@@ -775,7 +775,7 @@
       const [isLoading, setIsLoading] = useState(true);
 
       useEffect(() => {
-        const token = localStorage.getItem('adminToken');
+        const token = sessionStorage.getItem('adminToken');
         if (token) {
           checkUser();
         } else {
@@ -788,14 +788,14 @@
           setUser({ name: 'Admin', email: 'admin@pathlab.com' });
           await loadAppointments();
         } catch (error) {
-          localStorage.removeItem('adminToken');
+          sessionStorage.removeItem('adminToken');
         }
         setIsLoading(false);
       };
 
       const loadAppointments = async () => {
           try {
-              const token = localStorage.getItem('adminToken');
+              const token = sessionStorage.getItem('adminToken');
               const response = await fetch('/api/admin/appointments', {
                   method: 'GET'
                   headers: {
@@ -927,7 +927,7 @@
       };
 
       const handleLogout = () => {
-        localStorage.removeItem('adminToken');
+        sessionStorage.removeItem('adminToken');
         setUser(null);
       };
 
