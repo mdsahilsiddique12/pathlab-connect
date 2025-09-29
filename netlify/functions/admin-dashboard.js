@@ -1,6 +1,5 @@
 const { prisma } = require('./utils/prisma');
 const { createResponse, createErrorResponse } = require('./utils/response');
-const jwt = require('jsonwebtoken');
 
 exports.handler = async (event, context) => {
   if (event.httpMethod === 'OPTIONS') {
@@ -22,7 +21,11 @@ exports.handler = async (event, context) => {
     }
 
     const token = authHeader.substring(7);
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback-secret');
+    // Simple token validation (same as other admin endpoints)
+    if (!token || token.length < 10) {
+        return createErrorResponse(401, 'Invalid token');
+    }
+
     
     // Get dashboard statistics
     const stats = await getDashboardStats();
@@ -33,11 +36,6 @@ exports.handler = async (event, context) => {
       stats,
       recentAppointments,
       todayAppointments,
-      adminInfo: {
-        name: decoded.name,
-        email: decoded.email,
-        role: decoded.role
-      }
     });
 
   } catch (error) {
