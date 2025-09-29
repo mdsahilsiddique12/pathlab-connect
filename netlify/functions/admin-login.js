@@ -26,8 +26,8 @@ exports.handler = async (event, context) => {
     console.log('Admin login attempt:', email);
 
     // Check credentials from environment variables
-    const adminEmail = process.env.ADMIN_EMAIL || 'admin@pathlab.com';
-    const adminPassword = process.env.ADMIN_PASSWORD || 'admin123';
+    const adminEmail = process.env.ADMIN_EMAIL || 'mdsahilsiddique12@gmail.com';
+    const adminPassword = process.env.ADMIN_PASSWORD || 'Sahiladil@123';
 
     if (email === adminEmail && password === adminPassword) {
       // Simple token (no JWT) - matches what admin.html expects
