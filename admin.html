@@ -794,11 +794,15 @@
       };
 
       const loadAppointments = async () => {
-        try {
-          const token = localStorage.getItem('admin_token');
-          const response = await fetch('/api/admin/appointments', {
-            headers: { 'Authorization': `Bearer ${token}` }
-          });
+          try {
+              const token = localStorage.getItem('admintoken');
+              const response = await fetch('/api/admin/appointments', {
+                  method: 'GET',
+                  headers: {
+                      'Content-Type': 'application/json',
+                      'Authorization': `Bearer ${token}`
+                  }
+              });
 
           if (response.ok) {
             const result = await response.json();
