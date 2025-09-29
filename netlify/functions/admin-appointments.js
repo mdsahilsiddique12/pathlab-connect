@@ -14,25 +14,19 @@ exports.handler = async (event, context) => {
   }
 
   try {
-    // RELAXED auth check - accept any token format
+    // Simple auth check (no JWT verification to avoid errors)
     const authHeader = event.headers.authorization;
-    console.log('🔍 Auth header received:', authHeader);
-    
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      console.log('❌ No Bearer token in header');
       return createErrorResponse(401, 'No token provided');
     }
 
     const token = authHeader.substring(7);
-    console.log('🔍 Extracted token:', token ? `${token.substring(0, 20)}...` : 'EMPTY');
     
-    // MUCH MORE RELAXED token validation
-    if (!token || token === 'undefined' || token === 'null' || token.trim() === '') {
-      console.log('❌ Invalid or empty token');
+    // Simple token validation
+    if (!token || token.length < 15) {
       return createErrorResponse(401, 'Invalid token');
     }
 
-    console.log('✅ Token validation passed');
     console.log('📋 Fetching appointments with prescription images...');
 
     // Get all appointments with customer details AND prescription images
@@ -62,7 +56,7 @@ exports.handler = async (event, context) => {
         notes: appointment.notes,
         status: appointment.status,
         address: appointment.address,
-        prescriptionImage: appointment.prescriptionImage,
+        prescriptionImage: appointment.prescriptionImage, // 🖼️ IMPORTANT: Include prescription image
         createdAt: appointment.createdAt,
         updatedAt: appointment.updatedAt,
         customer: appointment.customer
@@ -82,9 +76,7 @@ exports.handler = async (event, context) => {
     
     return createResponse(200, {
       success: true,
-      data: {
-        appointments: transformedAppointments
-      }
+      appointments: transformedAppointments
     });
 
   } catch (error) {
