@@ -1017,7 +1017,7 @@
             });
             
             // Send to correct Netlify function endpoint
-            const response = await fetch('/api/appointments-create', {
+            const response = await fetch('/api/appointments/create', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
