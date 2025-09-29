@@ -1,5 +1,6 @@
-const { prisma } = require('./utils/prisma');
-const { createResponse, createErrorResponse } = require('./utils/response');
+const { prisma } = require('../utils/prisma');
+const { createResponse, createErrorResponse } = require('../utils/response');
+const { validateSession } = require('../utils/auth-middleware');
 
 exports.handler = async (event, context) => {
   if (event.httpMethod === 'OPTIONS') {
@@ -7,7 +8,7 @@ exports.handler = async (event, context) => {
       statusCode: 200,
       headers: {
         'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+        'Access-Control-Allow-Headers': 'Content-Type, X-Session-ID',
         'Access-Control-Allow-Methods': 'POST, OPTIONS'
       }
     };
@@ -18,41 +19,34 @@ exports.handler = async (event, context) => {
   }
 
   try {
-    // Simple auth check (no JWT verification)
-    const authHeader = event.headers.authorization;
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return createErrorResponse(401, 'No token provided');
-    }
-
-    const token = authHeader.substring(7);
+    // Validate session
+    const sessionId = event.headers['x-session-id'];
+    const session = validateSession(sessionId);
     
-    // Simple token validation
-    if (!token || token.length < 10) {
-      return createErrorResponse(401, 'Invalid token');
+    if (!session) {
+      return createErrorResponse(401, 'Invalid or expired session');
     }
 
     const requestBody = JSON.parse(event.body);
     const { appointmentId, status, notes } = requestBody;
 
-    console.log('📝 Status update request:', { appointmentId, status, notes });
+    console.log('📝 Status update request from authenticated session:', { 
+      appointmentId: appointmentId?.substring(0, 8), 
+      status, 
+      notes,
+      sessionUser: session.userId 
+    });
 
     if (!appointmentId || !status) {
-      return createErrorResponse(400, 'Appointment ID and status required');
+      return createErrorResponse(400, 'appointmentId and status are required');
     }
 
-    // Valid status values
-    const validStatuses = ['PENDING', 'Received', 'Contacted', 'Confirmed', 'Completed', 'Cancelled'];
-    if (!validStatuses.includes(status)) {
-      return createErrorResponse(400, 'Invalid status value');
-    }
-
-    // Update appointment status in database
     const updatedAppointment = await prisma.appointment.update({
       where: { id: appointmentId },
-      data: {
+      data: { 
         status: status,
-        notes: notes || '',
-        updatedAt: new Date() // Force update timestamp
+        admin_notes: notes || '',
+        updatedAt: new Date()
       },
       include: {
         customer: {
@@ -65,44 +59,18 @@ exports.handler = async (event, context) => {
       }
     });
 
-    console.log('✅ Status updated successfully in database:', {
-      id: updatedAppointment.id,
-      newStatus: updatedAppointment.status,
-      customer: updatedAppointment.customer.fullName
-    });
-
-    // Send notification to customer about status change (optional)
-    if (updatedAppointment.customer) {
-      console.log(`📱 Status change notification: ${updatedAppointment.customer.fullName} - ${status}`);
-      
-      // You can add WhatsApp/Email notification logic here if needed
-      // await sendStatusUpdateNotification(updatedAppointment);
-    }
+    console.log(`✅ Session authenticated - Updated appointment ${appointmentId.substring(0, 8)} to ${status}`);
 
     return createResponse(200, {
       success: true,
       message: 'Status updated successfully',
-      appointment: {
-        id: updatedAppointment.id,
-        status: updatedAppointment.status,
-        notes: updatedAppointment.notes,
-        updatedAt: updatedAppointment.updatedAt,
-        customer: updatedAppointment.customer
+      data: {
+        appointment: updatedAppointment
       }
     });
 
   } catch (error) {
-    console.error('❌ Status update error:', error);
-    
-    // Handle specific Prisma errors
-    if (error.code === 'P2025') {
-      return createErrorResponse(404, 'Appointment not found');
-    }
-    
-    if (error.code === 'P2002') {
-      return createErrorResponse(409, 'Appointment conflict');
-    }
-    
-    return createErrorResponse(500, `Failed to update status: ${error.message}`);
+    console.error('❌ Update status error:', error);
+    return createErrorResponse(500, 'Failed to update status');
   }
 };
