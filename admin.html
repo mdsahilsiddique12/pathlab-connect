@@ -797,7 +797,7 @@
           try {
               const token = sessionStorage.getItem('adminToken');
               const response = await fetch('/api/admin/appointments', {
-                  method: 'GET'
+                  method: 'GET',
                   headers: {
                       'Content-Type': 'application/json',
                       'Authorization': `Bearer ${token}`
