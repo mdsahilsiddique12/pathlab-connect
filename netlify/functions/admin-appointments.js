@@ -23,7 +23,7 @@ exports.handler = async (event, context) => {
     const token = authHeader.substring(7);
     
     // Simple token validation
-    if (!token || token.length < 15) {
+    if (!token || token.length < 10) {
       return createErrorResponse(401, 'Invalid token');
     }
 
