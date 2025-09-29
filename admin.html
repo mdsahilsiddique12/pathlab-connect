@@ -933,7 +933,7 @@
 
       const handleStatusUpdate = async (appointmentId, newStatus, adminNotes) => {
           try {
-              const token = localStorage.getItem('adminToken');
+              const token = sessionStorage.getItem('adminToken');
               
               // 🚀 CALL BACKEND API FIRST
               const response = await fetch('/api/admin/update-status', {
