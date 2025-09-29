@@ -1,5 +1,5 @@
-const { createResponse, createErrorResponse } = require('../utils/response');
-const { createSession } = require('../utils/auth-middleware');
+const { createResponse, createErrorResponse } = require('./utils/response');
+const { createSession } = require('./utils/auth-middleware');
 
 exports.handler = async (event, context) => {
   if (event.httpMethod === 'OPTIONS') {
@@ -27,7 +27,7 @@ exports.handler = async (event, context) => {
     console.log('🔐 Login attempt:', email);
 
     // Check credentials from environment variables
-    const adminEmail = process.env.ADMIN_EMAIL || 'admin@pathlab.com';
+    const adminEmail = process.env.ADMIN_EMAIL || 'mdsahilsiddique12@gmail.com';
     const adminPassword = process.env.ADMIN_PASSWORD || 'admin123';
 
     if (email === adminEmail && password === adminPassword) {
