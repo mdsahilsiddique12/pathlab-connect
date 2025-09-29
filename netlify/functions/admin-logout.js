@@ -1,5 +1,5 @@
-const { createResponse, createErrorResponse } = require('../utils/response');
-const { destroySession } = require('../utils/auth-middleware');
+const { createResponse, createErrorResponse } = require('./utils/response');
+const { destroySession } = require('./utils/auth-middleware');
 
 exports.handler = async (event, context) => {
   if (event.httpMethod === 'OPTIONS') {
