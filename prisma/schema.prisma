@@ -1,14 +1,13 @@
 datasource db {
   provider  = "postgresql"
-  // Pooled connection for the app (Neon pooler hostname, requires SSL)
-  url       = env("DATABASE_URL")
-  // Direct, non-pooled connection for Prisma CLI (migrations/introspection)
-  directUrl = env("DIRECT_URL")
+  url       = env("DATABASE_URL")   // Neon pooler host with sslmode=require
+  directUrl = env("DIRECT_URL")     // Neon direct host with sslmode=require
 }
 
 generator client {
   provider = "prisma-client-js"
 }
+
 
 
 
