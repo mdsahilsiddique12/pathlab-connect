@@ -795,7 +795,7 @@
 
       const loadAppointments = async () => {
           try {
-              const token = localStorage.getItem('admintoken');
+              const token = localStorage.getItem('adminToken');
               const response = await fetch('/api/admin/appointments', {
                   method: 'GET',
                   headers: {
