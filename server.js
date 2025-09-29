@@ -86,18 +86,35 @@ app.options('*', (req, res) => {
   res.sendStatus(200);
 });
 
-// Serve frontend for any non-API routes
 app.get('*', (req, res) => {
-  // Check if it's trying to access admin.html
-  if (req.path === '/admin' || req.path === '/admin.html') {
-    res.sendFile(path.join(__dirname, 'admin.html'));
-  } else {
-    res.sendFile(path.join(__dirname, 'web/index.html'));
+  try {
+    // Check if it's trying to access admin.html
+    if (req.path === '/admin' || req.path === '/admin.html') {
+      return res.sendFile(path.join(__dirname, 'admin.html'));
+    }
+    
+    // Try to serve from web folder, fallback to a simple response
+    const frontendPath = path.join(__dirname, 'web/index.html');
+    if (require('fs').existsSync(frontendPath)) {
+      res.sendFile(frontendPath);
+    } else {
+      // Frontend not built - show a simple message
+      res.send(`
+        <h1>🚀 PathLab Connect API is running!</h1>
+        <p>Server is running on port ${PORT}</p>
+        <p><a href="/admin.html">👨‍💼 Admin Panel</a></p>
+        <p>API Endpoints:</p>
+        <ul>
+          <li>POST /api/appointments/create</li>
+          <li>GET /api/appointments/track/:id</li>
+          <li>POST /api/admin/login</li>
+          <li>GET /api/admin/dashboard</li>
+          <li>GET /api/admin/appointments</li>
+        </ul>
+      `);
+    }
+  } catch (error) {
+    console.error('Route error:', error);
+    res.status(500).send('Server error');
   }
-});
-
-app.listen(PORT, () => {
-  console.log(`🚀 PathLab Connect Server running on port ${PORT}`);
-  console.log(`📱 Frontend: http://localhost:${PORT}`);
-  console.log(`👨‍💼 Admin: http://localhost:${PORT}/admin.html`);
 });
