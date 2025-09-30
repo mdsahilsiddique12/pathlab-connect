@@ -1,496 +1,393 @@
-// =======================================
-// PathLab Connect - Advanced Messaging System
-// Handles WhatsApp and Email notifications with professional templates
-// =======================================
+const https = require('https');
+const nodemailer = require('emailjs');
 
-console.log('🚀 Starting messaging service...');
-
-// Initialize Resend - ONLY CHANGE
-const resend = new Resend(process.env.RESEND_API_KEY);
-
-// =======================================
-// WHATSAPP MESSAGING SERVICE - UNCHANGED
-// =======================================
-
-const sendWhatsAppMessage = async (recipientPhone, message) => {
-    console.log(`📱 Sending WhatsApp to customer...`);
-    console.log(`📱 Phone format: ${recipientPhone}`)
+// WhatsApp Business API Function
+async function sendWhatsAppMessage(phoneNumber, message) {
+  try {
+    const whatsappToken = process.env.WHATSAPP_TOKEN;
+    const phoneId = process.env.WHATSAPP_PHONE_ID;
     
-    try {
-        const whatsappData = {
-            messaging_product: "whatsapp",
-            to: recipientPhone,
-            type: "text",
-            text: {
-                body: message
-            }
-        };
+    if (!whatsappToken || !phoneId) {
+      console.log('❌ WhatsApp credentials missing in .env');
+      return false;
+    }
 
-        const response = await fetch('https://graph.facebook.com/v18.0/510518432165203/messages', {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${process.env.WHATSAPP_TOKEN}`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(whatsappData)
-        });
+    // Clean phone number
+    const cleanPhone = phoneNumber.replace(/\+/g, '').replace(/\s/g, '');
+    
+    const postData = JSON.stringify({
+      messaging_product: "whatsapp",
+      to: cleanPhone,
+      type: "text",
+      text: {
+        preview_url: false,
+        body: message
+      }
+    });
 
-        console.log(`WhatsApp API Response Status: ${response.status}`);
+    const options = {
+      hostname: 'graph.facebook.com',
+      port: 443,
+      path: `/v18.0/${phoneId}/messages`,
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${whatsappToken}`,
+        'Content-Type': 'application/json',
+        'Content-Length': Buffer.byteLength(postData)
+      }
+    };
+
+    return new Promise((resolve) => {
+      const req = https.request(options, (res) => {
+        let data = '';
         
-        if (response.status === 200) {
+        res.on('data', (chunk) => {
+          data += chunk;
+        });
+        
+        res.on('end', () => {
+          console.log('WhatsApp API Response Status:', res.statusCode);
+          
+          if (res.statusCode === 200) {
             console.log('✅ WhatsApp message sent successfully');
-            return true;
-        } else {
-            console.log('❌ WhatsApp sending failed');
+            resolve(true);
+          } else {
+            console.log('❌ WhatsApp API Error:', res.statusCode, data);
+            resolve(false);
+          }
+        });
+      });
+
+      req.on('error', (error) => {
+        console.log('❌ WhatsApp request error:', error.message);
+        resolve(false);
+      });
+
+      req.write(postData);
+      req.end();
+    });
+
+  } catch (error) {
+    console.log('❌ WhatsApp send error:', error.message);
+    return false;
+  }
+}
+
+//// REAL Email Sending Function using EmailJS with HTML content from code
+async function sendEmail(recipientEmail, customerName, messageData, isAdmin = false) {
+    try {
+        // EmailJS configuration from environment variables
+        const serviceId = process.env.EMAILJS_SERVICE_ID;
+        const templateId = process.env.EMAILJS_TEMPLATE_ID; // Only ONE template needed
+        const publicKey = process.env.EMAILJS_PUBLIC_KEY;
+        const privateKey = process.env.EMAILJS_PRIVATE_KEY;
+        
+        if (!serviceId || !publicKey || !templateId) {
+            console.log('EmailJS credentials missing in .env file');
+            console.log('Required: EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, EMAILJS_PUBLIC_KEY');
             return false;
         }
-    } catch (error) {
-        console.error('❌ WhatsApp Error:', error.response?.data || error.message);
-        return false;
-    }
-};
 
-// =======================================
-// =======================================
-// EMAIL SERVICE WITH EMAILJS - NEW
-// =======================================
+        console.log('Setting up EmailJS...');
+        
+        // Import EmailJS
+        const emailjs = require('@emailjs/nodejs');
 
-const emailjs = require('@emailjs/nodejs');
+        let htmlContent, subject;
+        
+        if (isAdmin) {
+            // ADMIN EMAIL - Generated HTML content
+            subject = `🚨 NEW APPOINTMENT - ${messageData.bookingId}`;
+            htmlContent = `
+            <div style="font-family: system-ui, sans-serif, Arial; font-size: 14px; color: #333; padding: 14px 8px; background-color: #f5f5f5;">
+                <div style="max-width: 600px; margin: auto; background-color: #fff">
+                    <div style="border-top: 6px solid #e74c3c; padding: 16px; background-color: #fff2f2;">
+                        <h2 style="margin: 0; color: #c0392b;">🚨 NEW APPOINTMENT ALERT</h2>
+                        <p style="margin: 5px 0; color: #666;">PathLab Connect Admin Panel</p>
+                    </div>
+                    
+                    <div style="padding: 20px;">
+                        <p style="color: #333; font-size: 16px;"><strong>New lab appointment has been booked!</strong></p>
+                        <p>A customer has successfully booked an appointment. Please review and assign a technician.</p>
+                        
+                        <div style="background: #fff8e1; border: 1px solid #ffd54f; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                            <h3 style="margin: 0 0 15px 0; color: #f57c00;">📋 Booking Details #${messageData.bookingId}</h3>
+                            
+                            <table style="width: 100%; border-collapse: collapse;">
+                                <tr><td style="padding: 8px; font-weight: 600; color: #4a5568; width: 40%;">🆔 Booking ID:</td><td style="padding: 8px;">${messageData.bookingId}</td></tr>
+                                <tr style="background-color: #f8faff;"><td style="padding: 8px; font-weight: 600; color: #4a5568;">👤 Customer:</td><td style="padding: 8px;">${customerName}</td></tr>
+                                <tr><td style="padding: 8px; font-weight: 600; color: #4a5568;">📱 Phone:</td><td style="padding: 8px;">${messageData.customerPhone}</td></tr>
+                                <tr style="background-color: #f8faff;"><td style="padding: 8px; font-weight: 600; color: #4a5568;">📧 Email:</td><td style="padding: 8px;">${recipientEmail}</td></tr>
+                                <tr><td style="padding: 8px; font-weight: 600; color: #4a5568;">🧪 Tests:</td><td style="padding: 8px;">${messageData.selectedTests}</td></tr>
+                                <tr style="background-color: #f8faff;"><td style="padding: 8px; font-weight: 600; color: #4a5568;">📅 Date:</td><td style="padding: 8px;">${messageData.collectionDate}</td></tr>
+                                <tr><td style="padding: 8px; font-weight: 600; color: #4a5568;">⏰ Time:</td><td style="padding: 8px;">${messageData.timeSlot}</td></tr>
+                                <tr style="background-color: #f8faff;"><td style="padding: 8px; font-weight: 600; color: #4a5568;">📍 Address:</td><td style="padding: 8px;">${messageData.address}</td></tr>
+                            </table>
+                        </div>
+                        
+                        <div style="background: #ffebee; border: 1px solid #e57373; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                            <h4 style="margin: 0 0 15px 0; color: #d32f2f;">⚠️ ACTION REQUIRED</h4>
+                            <ul style="margin: 0; padding-left: 20px; color: #c62828;">
+                                <li style="margin-bottom: 8px;"><strong>Assign technician within 2 hours</strong></li>
+                                <li style="margin-bottom: 8px;"><strong>Contact customer to confirm timing</strong></li>
+                                <li style="margin-bottom: 8px;"><strong>Prepare test equipment</strong></li>
+                                <li style="margin-bottom: 8px;"><strong>Update appointment status in system</strong></li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div style="background: #2d3748; color: white; padding: 25px; text-align: center;">
+                        <p style="margin: 5px 0;"><strong>PathLab Connect Admin Panel</strong></p>
+                        <p style="margin: 5px 0;">📞 Emergency: +91-7979806128</p>
+                        <p style="margin: 5px 0;">⏰ Booking Time: ${new Date().toLocaleString('en-IN')}</p>
+                    </div>
+                </div>
+            </div>`;
+            
+        } else {
+            // PATIENT EMAIL - Your beautiful HTML template with variables replaced
+            subject = `Lab Appointment Confirmed - Booking ID ${messageData.bookingId}`;
+            htmlContent = `
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>PathLab Connect - Booking Confirmation</title>
+            </head>
+            <body>
+            <div style="font-family: system-ui, sans-serif, Arial; font-size: 14px; color: #333; padding: 14px 8px; background-color: #f5f5f5;">
+              <div style="max-width: 600px; margin: auto; background-color: #fff">
+                <div style="border-top: 6px solid #458500; padding: 16px">
+                  <a style="text-decoration: none; outline: none; margin-right: 8px; vertical-align: middle" href="https://pathlabconnect.up.railway.app" target="_blank">
+                    <img style="height: 32px; vertical-align: middle" height="32px" src="https://via.placeholder.com/100x32/458500/ffffff?text=PathLab" alt="PathLab Connect" />
+                  </a>
+                  <span style="font-size: 16px; vertical-align: middle; border-left: 1px solid #333; padding-left: 8px;">
+                    <strong>🧪 PathLab Connect - Booking Confirmed</strong>
+                  </span>
+                </div>
+                <div style="padding: 0 16px">
+                  <p>Hello ${customerName}! 👋</p>
+                  <p>Thank you for choosing PathLab Connect. Your booking has been <strong>successfully confirmed</strong>!</p>
+                  <p>Our team will contact you soon to finalize the collection details.</p>
+                  
+                  <div style="text-align: left; font-size: 14px; padding-bottom: 4px; border-bottom: 2px solid #333; margin: 20px 0;">
+                    <strong>📋 Booking Details #${messageData.bookingId}</strong>
+                  </div>
 
-// Initialize EmailJS
-emailjs.init({
-    publicKey: process.env.EMAILJS_PUBLIC_KEY,
-    privateKey: process.env.EMAILJS_PRIVATE_KEY
-});
+                  <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
+                    <tr style="vertical-align: top">
+                      <td style="padding: 8px; font-weight: 600; color: #4a5568; width: 40%;">🆔 Booking ID:</td>
+                      <td style="padding: 8px; color: #1a202c;">${messageData.bookingId}</td>
+                    </tr>
+                    <tr style="vertical-align: top; background-color: #f8faff;">
+                      <td style="padding: 8px; font-weight: 600; color: #4a5568;">👤 Customer Name:</td>
+                      <td style="padding: 8px; color: #1a202c;">${customerName}</td>
+                    </tr>
+                    <tr style="vertical-align: top">
+                      <td style="padding: 8px; font-weight: 600; color: #4a5568;">📱 Phone Number:</td>
+                      <td style="padding: 8px; color: #1a202c;">${messageData.customerPhone}</td>
+                    </tr>
+                    <tr style="vertical-align: top; background-color: #f8faff;">
+                      <td style="padding: 8px; font-weight: 600; color: #4a5568;">🧪 Selected Tests:</td>
+                      <td style="padding: 8px; color: #1a202c;">${messageData.selectedTests}</td>
+                    </tr>
+                    <tr style="vertical-align: top">
+                      <td style="padding: 8px; font-weight: 600; color: #4a5568;">📅 Collection Date:</td>
+                      <td style="padding: 8px; color: #1a202c;">${messageData.collectionDate}</td>
+                    </tr>
+                    <tr style="vertical-align: top; background-color: #f8faff;">
+                      <td style="padding: 8px; font-weight: 600; color: #4a5568;">⏰ Time Slot:</td>
+                      <td style="padding: 8px; color: #1a202c;">${messageData.timeSlot}</td>
+                    </tr>
+                    <tr style="vertical-align: top">
+                      <td style="padding: 8px; font-weight: 600; color: #4a5568;">📍 Collection Address:</td>
+                      <td style="padding: 8px; color: #1a202c;">${messageData.address}</td>
+                    </tr>
+                  </table>
 
-const sendEmail = async (recipientEmail, subject, htmlContent, textContent) => {
-    console.log('📧 Sending REAL email to patient...');
-    console.log('📧 Setting up email transporter...');
-    
-    try {
+                  <div style="padding: 24px 0">
+                    <div style="border-top: 2px solid #333"></div>
+                  </div>
+                  
+                  <div style="background: #fff8e1; border: 1px solid #ffd54f; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                    <h4 style="margin: 0 0 15px 0; color: #f57c00;">📝 Important Instructions</h4>
+                    <ul style="margin: 0; padding-left: 20px;">
+                      <li style="margin-bottom: 8px; color: #e65100;"><strong>Fasting Requirements:</strong> Please fast for 10-12 hours if blood sugar tests are included</li>
+                      <li style="margin-bottom: 8px; color: #e65100;"><strong>Sample Collection:</strong> Our technician will arrive at your specified time</li>
+                      <li style="margin-bottom: 8px; color: #e65100;"><strong>Payment:</strong> Can be made during sample collection (Cash/UPI)</li>
+                      <li style="margin-bottom: 8px; color: #e65100;"><strong>Reports:</strong> Will be available within 24-48 hours via WhatsApp and email</li>
+                      <li style="margin-bottom: 8px; color: #e65100;"><strong>Rescheduling:</strong> Contact us at least 2 hours before appointment</li>
+                    </ul>
+                  </div>
+
+                </div>
+                
+                <div style="background: #2d3748; color: white; padding: 25px; text-align: center;">
+                  <p style="margin: 5px 0;"><strong>PathLab Connect</strong> - Your Health, Our Priority</p>
+                  <div style="margin-top: 20px;">
+                    <p style="margin: 5px 0;">📞 Customer Care: +91-7979806128</p>
+                    <p style="margin: 5px 0;">📧 Email: uniquepathlab05@gmail.com</p>
+                    <p style="margin: 5px 0;">🌐 Website: www.pathlabconnect.up.railway.app</p>
+                  </div>
+                  <p style="font-size: 12px; margin-top: 15px; opacity: 0.8;">
+                    © 2024 PathLab Connect. All rights reserved.
+                  </p>
+                </div>
+              </div>
+              
+              <div style="max-width: 600px; margin: auto">
+                <p style="color: #999; text-align: center; margin-top: 30px;">
+                  Need to make changes? Contact us immediately at <strong>+91-7979806128</strong><br />
+                  The email was sent to ${recipientEmail}
+                </p>
+              </div>
+            </div>
+            </body>
+            </html>`;
+        }
+
         const templateParams = {
-            customer_name: messageData.customerName || 'Valued Customer',
-            customer_email: messageData.customerEmail,
-            customer_phone: messageData.customerPhone,
-            booking_id: messageData.bookingId,
-            selected_tests: messageData.selectedTests,
-            collection_date: messageData.collectionDate,
-            time_slot: messageData.timeSlot,
-            address: messageData.address,
             to_email: recipientEmail,
-            subject: subject
+            subject: subject,
+            html_content: htmlContent // This will be inserted using {{{html_content}}}
         };
 
+        console.log(`Sending ${isAdmin ? 'admin' : 'patient'} email via EmailJS to:`, recipientEmail);
+
+        // Send email using EmailJS
         const response = await emailjs.send(
-            process.env.EMAILJS_SERVICE_ID,
-            process.env.EMAILJS_TEMPLATE_ID,
-            templateParams
+            serviceId,
+            templateId,
+            templateParams,
+            {
+                publicKey: publicKey,
+                privateKey: privateKey,
+            }
         );
 
-        console.log('✅ Email sent successfully:', response.status, response.text);
+        console.log('EmailJS response:', response.status, response.text);
+        console.log('Email sent successfully via EmailJS!');
+        console.log('Email sent to:', recipientEmail);
         return true;
+
     } catch (error) {
-        console.error('❌ Email sending failed:', error);
+        console.error('EmailJS send error:', error.message);
+        
+        // Provide helpful error messages
+        if (error.status === 400) {
+            console.log('EmailJS Bad Request: Check template parameters and IDs');
+        } else if (error.status === 401) {
+            console.log('EmailJS Unauthorized: Check your public/private keys');
+        } else if (error.status === 402) {
+            console.log('EmailJS Payment Required: Check your EmailJS account limits');
+        } else if (error.status === 404) {
+            console.log('EmailJS Not Found: Check your service ID and template ID');
+        }
+        
         return false;
     }
-};
+}
 
 
+// Main notification function
+async function sendNotifications(appointmentData, bookingId) {
+  try {
+    console.log('🚀 Starting messaging service...');
 
-// Everything else stays the same - all WhatsApp code, templates, etc.
-
-
-
-// =======================================
-// EMAIL TEMPLATES - COMPLETELY UNCHANGED
-// =======================================
-
-const generateCustomerEmailTemplate = (messageData) => {
-    const customerName = messageData.customerName || 'Valued Customer';
-    
-    return `
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PathLab Connect - Booking Confirmation</title>
-    <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; background-color: #f8fafc; }
-        .container { max-width: 600px; margin: 0 auto; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; text-align: center; color: white; }
-        .header h1 { margin: 0; font-size: 28px; font-weight: 600; }
-        .header p { margin: 10px 0 0 0; font-size: 16px; opacity: 0.9; }
-        .content { padding: 40px 30px; }
-        .booking-card { background: #f8faff; border-left: 4px solid #667eea; padding: 25px; margin: 25px 0; border-radius: 8px; }
-        .booking-card h3 { margin: 0 0 20px 0; color: #1a202c; font-size: 20px; }
-        .detail-row { display: flex; justify-content: space-between; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid #e2e8f0; }
-        .detail-label { font-weight: 600; color: #4a5568; }
-        .detail-value { color: #1a202c; }
-        .status-badge { background: #10b981; color: white; padding: 8px 16px; border-radius: 20px; font-weight: 600; display: inline-block; margin: 20px 0; }
-        .instructions { background: #fff8e1; border: 1px solid #ffd54f; padding: 20px; border-radius: 8px; margin: 25px 0; }
-        .instructions h4 { margin: 0 0 15px 0; color: #f57c00; }
-        .instructions ul { margin: 0; padding-left: 20px; }
-        .instructions li { margin-bottom: 8px; color: #e65100; }
-        .footer { background: #2d3748; color: white; padding: 25px; text-align: center; }
-        .footer p { margin: 5px 0; }
-        .contact-info { margin-top: 20px; }
-        .button { background: #667eea; color: white; padding: 12px 25px; border-radius: 6px; text-decoration: none; display: inline-block; font-weight: 600; margin: 15px 0; }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="header">
-            <h1>🧪 PathLab Connect</h1>
-            <p>Professional Diagnostic Services</p>
-        </div>
-        
-        <div class="content">
-            <h2 style="color: #1a202c; margin-bottom: 10px;">Hello ${customerName}! 👋</h2>
-            <p style="color: #4a5568; font-size: 16px; line-height: 1.6; margin-bottom: 25px;">
-                Thank you for choosing PathLab Connect. Your booking has been <strong>successfully confirmed</strong>! 
-                Our team will contact you soon to finalize the collection details.
-            </p>
-            
-            <div class="status-badge">✅ Booking Confirmed</div>
-            
-            <div class="booking-card">
-                <h3>📋 Your Booking Details</h3>
-                <div class="detail-row">
-                    <span class="detail-label">🆔 Booking ID:</span>
-                    <span class="detail-value">${messageData.bookingId}</span>
-                </div>
-                <div class="detail-row">
-                    <span class="detail-label">👤 Customer Name:</span>
-                    <span class="detail-value">${customerName}</span>
-                </div>
-                <div class="detail-row">
-                    <span class="detail-label">📱 Phone Number:</span>
-                    <span class="detail-value">${messageData.customerPhone}</span>
-                </div>
-                <div class="detail-row">
-                    <span class="detail-label">🧪 Selected Tests:</span>
-                    <span class="detail-value">${messageData.selectedTests}</span>
-                </div>
-                <div class="detail-row">
-                    <span class="detail-label">📅 Collection Date:</span>
-                    <span class="detail-value">${messageData.collectionDate}</span>
-                </div>
-                <div class="detail-row">
-                    <span class="detail-label">⏰ Time Slot:</span>
-                    <span class="detail-value">${messageData.timeSlot}</span>
-                </div>
-                <div class="detail-row">
-                    <span class="detail-label">📍 Collection Address:</span>
-                    <span class="detail-value">${messageData.address}</span>
-                </div>
-            </div>
-            
-            <div class="instructions">
-                <h4>📝 Important Instructions</h4>
-                <ul>
-                    <li><strong>Fasting Requirements:</strong> Please fast for 10-12 hours if blood sugar tests are included</li>
-                    <li><strong>Sample Collection:</strong> Our technician will arrive at your specified time</li>
-                    <li><strong>Payment:</strong> Can be made during sample collection (Cash/UPI)</li>
-                    <li><strong>Reports:</strong> Will be available within 24-48 hours via WhatsApp and email</li>
-                    <li><strong>Rescheduling:</strong> Contact us at least 2 hours before appointment</li>
-                </ul>
-            </div>
-            
-            <p style="color: #4a5568; font-size: 14px; text-align: center; margin-top: 30px;">
-                Need to make changes? Contact us immediately at <strong>+91-XXXXXXXXXX</strong>
-            </p>
-        </div>
-        
-        <div class="footer">
-            <p><strong>PathLab Connect</strong> - Your Health, Our Priority</p>
-            <div class="contact-info">
-                <p>📞 Customer Care: +91-XXXXXXXXXX</p>
-                <p>📧 Email: support@pathlabconnect.com</p>
-                <p>🌐 Website: www.pathlabconnect.com</p>
-            </div>
-            <p style="font-size: 12px; margin-top: 15px; opacity: 0.8;">
-                © 2024 PathLab Connect. All rights reserved.
-            </p>
-        </div>
-    </div>
-</body>
-</html>`;
-};
-
-const generateAdminEmailTemplate = (messageData) => {
-    const customerName = messageData.customerName || 'Customer';
-    const recipientEmail = messageData.customerEmail || 'Not provided';
-    
-    return `
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PathLab Connect - New Booking Alert</title>
-    <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; background-color: #1a202c; }
-        .container { max-width: 600px; margin: 0 auto; background: white; border-radius: 12px; overflow: hidden; }
-        .header { background: linear-gradient(135deg, #e53e3e 0%, #dd6b20 100%); padding: 30px; text-align: center; color: white; }
-        .header h1 { margin: 0; font-size: 26px; font-weight: 600; }
-        .header p { margin: 10px 0 0 0; font-size: 14px; opacity: 0.9; }
-        .alert-badge { background: #feb2b2; color: #742a2a; padding: 12px 20px; border-radius: 25px; font-weight: 700; display: inline-block; margin: 15px 0; }
-        .content { padding: 35px 30px; }
-        .booking-details { background: #fed7d7; border-left: 4px solid #e53e3e; padding: 25px; margin: 20px 0; border-radius: 8px; }
-        .booking-details h3 { margin: 0 0 20px 0; color: #742a2a; font-size: 18px; }
-        .detail-item { margin-bottom: 12px; }
-        .detail-label { font-weight: 700; color: #742a2a; display: inline-block; min-width: 140px; }
-        .detail-value { color: #1a202c; }
-        .action-section { background: #ffeaa7; border: 2px solid #fdcb6e; padding: 20px; border-radius: 8px; margin: 25px 0; }
-        .action-section h4 { margin: 0 0 15px 0; color: #e17055; font-size: 16px; }
-        .action-list { margin: 0; padding-left: 20px; }
-        .action-list li { margin-bottom: 8px; color: #d63031; font-weight: 500; }
-        .footer { background: #2d3748; color: white; padding: 20px; text-align: center; }
-        .urgent { animation: pulse 2s infinite; }
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="header">
-            <h1>🚨 PathLab Connect - Admin Alert</h1>
-            <p>New Booking Notification System</p>
-        </div>
-        
-        <div class="content">
-            <div class="alert-badge urgent">🔔 NEW BOOKING RECEIVED!</div>
-            
-            <p style="color: #742a2a; font-size: 16px; font-weight: 600; margin-bottom: 25px;">
-                A new booking has been submitted and requires immediate attention from the admin team.
-            </p>
-            
-            <div class="booking-details">
-                <h3>📋 New Booking Details:</h3>
-                
-                <div class="detail-item">
-                    <span class="detail-label">🆔 Booking ID:</span>
-                    <span class="detail-value">${messageData.bookingId}</span>
-                </div>
-                
-                <div class="detail-item">
-                    <span class="detail-label">👤 Customer:</span>
-                    <span class="detail-value">${customerName}</span>
-                </div>
-                
-                <div class="detail-item">
-                    <span class="detail-label">📱 Phone:</span>
-                    <span class="detail-value">${messageData.customerPhone}</span>
-                </div>
-                
-                <div class="detail-item">
-                    <span class="detail-label">📧 Email:</span>
-                    <span class="detail-value">${recipientEmail}</span>
-                </div>
-                
-                <div class="detail-item">
-                    <span class="detail-label">🧪 Tests:</span>
-                    <span class="detail-value">${messageData.selectedTests}</span>
-                </div>
-                
-                <div class="detail-item">
-                    <span class="detail-label">📅 Collection Date:</span>
-                    <span class="detail-value">${messageData.collectionDate}</span>
-                </div>
-                
-                <div class="detail-item">
-                    <span class="detail-label">⏰ Time Slot:</span>
-                    <span class="detail-value">${messageData.timeSlot}</span>
-                </div>
-                
-                <div class="detail-item">
-                    <span class="detail-label">📍 Address:</span>
-                    <span class="detail-value">${messageData.address}</span>
-                </div>
-            </div>
-            
-            <div class="action-section">
-                <h4>⚠️ ACTION REQUIRED:</h4>
-                <ul class="action-list">
-                    <li>Assign technician within 2 hours</li>
-                    <li>Contact customer to confirm timing</li>
-                    <li>Prepare test equipment</li>
-                    <li>Update booking status in admin panel</li>
-                    <li>Schedule reminder notifications</li>
-                </ul>
-            </div>
-            
-            <p style="color: #e53e3e; font-weight: 600; text-align: center; margin-top: 25px;">
-                ⏰ Time Received: ${new Date().toLocaleString('en-IN', {timeZone: 'Asia/Kolkata'})}
-            </p>
-        </div>
-        
-        <div class="footer">
-            <p><strong>PathLab Connect Admin System</strong></p>
-            <p style="font-size: 12px; opacity: 0.8;">
-                This is an automated notification. Please take immediate action.
-            </p>
-        </div>
-    </div>
-</body>
-</html>`;
-};
-
-// =======================================
-// WHATSAPP TEMPLATES - COMPLETELY UNCHANGED
-// =======================================
-
-const generateCustomerWhatsAppMessage = (messageData) => {
-    const customerName = messageData.customerName || 'Valued Customer';
-    
-    return `🧪 *PathLab Connect* - Booking Confirmed! ✅
-
-Hello ${customerName}! 👋
-
-Thank you for choosing our services. Your booking has been *successfully confirmed*!
-
-📋 *BOOKING DETAILS:*
-🆔 ID: ${messageData.bookingId}
-👤 Name: ${customerName}
-📱 Phone: ${messageData.customerPhone}
-🧪 Tests: ${messageData.selectedTests}
-📅 Date: ${messageData.collectionDate}
-⏰ Time: ${messageData.timeSlot}
-📍 Address: ${messageData.address}
-
-📝 *IMPORTANT INSTRUCTIONS:*
-• Fast for 10-12 hours if blood sugar tests included
-• Our technician will arrive at scheduled time
-• Payment during collection (Cash/UPI)
-• Reports in 24-48 hours via WhatsApp & Email
-• For changes, contact us 2+ hours before
-
-Need help? Call: +91-XXXXXXXXXX
-
-*PathLab Connect* - Your Health, Our Priority! 🏥✨`;
-};
-
-const generateAdminWhatsAppMessage = (messageData) => {
-    const customerName = messageData.customerName || 'Customer';
-    
-    return `🚨 *ADMIN ALERT* - New Booking! 
-
-📋 *BOOKING DETAILS:*
-🆔 ID: ${messageData.bookingId}
-👤 Customer: ${customerName}
-📱 Phone: ${messageData.customerPhone}
-🧪 Tests: ${messageData.selectedTests}
-📅 Date: ${messageData.collectionDate}
-⏰ Time: ${messageData.timeSlot}
-📍 Address: ${messageData.address}
-
-⚠️ *ACTION REQUIRED:*
-• Assign technician within 2 hours
-• Contact customer to confirm
-• Prepare equipment
-• Update admin panel
-
-⏰ Received: ${new Date().toLocaleString('en-IN', {timeZone: 'Asia/Kolkata'})}
-
-*Take immediate action required!*`;
-};
-
-// =======================================
-// MAIN NOTIFICATION FUNCTIONS - COMPLETELY UNCHANGED
-// =======================================
-
-const sendCustomerNotifications = async (messageData) => {
-    const results = {
-        whatsapp: false,
-        email: false
+    // Prepare message data
+    const messageData = {
+      customerName: appointmentData.fullName,
+      customerPhone: appointmentData.phoneNumber,
+      bookingId: bookingId.substring(0, 8).toUpperCase(),
+      selectedTests: Array.isArray(appointmentData.tests) ? appointmentData.tests.join(', ') : appointmentData.tests,
+      collectionDate: new Date(appointmentData.collectionDate).toLocaleDateString('en-IN'),
+      timeSlot: appointmentData.timeSlot,
+      address: appointmentData.address
     };
 
-    console.log('📱 Starting customer notifications...');
+    // Customer WhatsApp message
+    const whatsappMessage = `🔬 *PathLab Connect*
 
-    // Send WhatsApp
-    const whatsappMessage = generateCustomerWhatsAppMessage(messageData);
-    results.whatsapp = await sendWhatsAppMessage(messageData.customerPhone, whatsappMessage);
+Hi ${messageData.customerName}! 
 
-    // Send Email
-    const emailHtml = generateCustomerEmailTemplate(messageData);
-    const subject = `🧪 PathLab Connect - Booking Confirmed #${messageData.bookingId}`;
-    results.email = await sendEmail(messageData.customerEmail, subject, emailHtml);
+Your lab appointment is CONFIRMED! ✅
 
-    return results;
-};
+📋 *Details:*
+🆔 ID: *${messageData.bookingId}*
+🧪 Tests: *${messageData.selectedTests}*
+📅 Date: *${messageData.collectionDate}*
+⏰ Time: *${messageData.timeSlot}*
+📍 Address: *${messageData.address}*
 
-const sendAdminNotifications = async (messageData) => {
-    const adminPhone = process.env.ADMIN_PHONE || '+919876543210';
-    const adminEmail = process.env.ADMIN_EMAIL || 'admin@pathlabconnect.com';
+*What's Next?*
+✅ Booking confirmed
+📱 Technician details within 2 hours
+🏠 Home collection at scheduled time
+📊 Results in 24-48 hours
+
+*Contact:* +91 7979 806 128
+*Email:* uniquepathlab05@gmail.com
+
+Thank you! 🙏`;
 
     const results = {
-        admin: false,
-        adminEmail: false
+      whatsapp: false,
+      email: false,
+      admin: false,
+      adminEmail: false
     };
 
-    console.log('🔔 Sending admin notifications...');
-
-    // Send WhatsApp to Admin
-    const adminWhatsAppMessage = generateAdminWhatsAppMessage(messageData);
-    results.admin = await sendWhatsAppMessage(adminPhone, adminWhatsAppMessage);
-
-    // Send Email to Admin
-    const adminEmailHtml = generateAdminEmailTemplate(messageData);
-    const adminSubject = `🚨 New Booking Alert #${messageData.bookingId} - Action Required`;
-    results.adminEmail = await sendEmail(adminEmail, adminSubject, adminEmailHtml);
-
-    return results;
-};
-
-// =======================================
-// MAIN EXPORT FUNCTION - COMPLETELY UNCHANGED
-// =======================================
-
-const processBookingNotifications = async (messageData) => {
-    console.log('📡 Starting background notification service...');
-    
-    try {
-        // Send customer notifications
-        const customerResults = await sendCustomerNotifications(messageData);
-        
-        // Send admin notifications  
-        const adminResults = await sendAdminNotifications(messageData);
-        
-        // Combine results
-        const finalResults = {
-            whatsapp: customerResults.whatsapp,
-            email: customerResults.email,
-            admin: adminResults.admin,
-            adminEmail: adminResults.adminEmail
-        };
-        
-        // Log final status
-        console.log('📊 Final Results:');
-        console.log(`📱 Customer WhatsApp: ${finalResults.whatsapp ? '✅ Sent' : '❌ Failed'}`);
-        console.log(`📧 Customer Email: ${finalResults.email ? '✅ Sent' : '❌ Failed'}`);
-        console.log(`📧 Admin Email: ${finalResults.adminEmail ? '✅ Sent' : '❌ Failed'}`);
-        console.log(`🔔 Admin WhatsApp: ${finalResults.admin ? '✅ Sent' : '❌ Failed'}`);
-        
-        return finalResults;
-        
-    } catch (error) {
-        console.error('❌ Background notification error:', error);
-        return {
-            whatsapp: false,
-            email: false, 
-            admin: false,
-            adminEmail: false
-        };
+    // Send WhatsApp to customer
+    if (appointmentData.phoneNumber) {
+      console.log('📱 Sending WhatsApp to customer...');
+      results.whatsapp = await sendWhatsAppMessage(appointmentData.phoneNumber, whatsappMessage);
     }
-};
+
+    // 📧 Send Email to PATIENT
+    if (appointmentData.emailAddress) {
+      console.log('📧 Sending REAL email to patient...');
+      results.email = await sendEmail(appointmentData.emailAddress, appointmentData.fullName, messageData, false);
+    }
+
+    // 📧 Send Email to ADMIN
+    const adminEmail = process.env.ADMIN_EMAIL || 'uniquepathlab05@gmail.com';
+    console.log('📧 Sending REAL email to admin...');
+    results.adminEmail = await sendEmail(adminEmail, appointmentData.fullName, messageData, true);
+
+    // Send WhatsApp to admin
+    const adminWhatsApp = process.env.ADMIN_WHATSAPP;
+    if (adminWhatsApp) {
+      const adminMessage = `🔔 *NEW APPOINTMENT*
+
+📋 ID: *${messageData.bookingId}*
+👤 Customer: *${appointmentData.fullName}*
+📱 Phone: *${appointmentData.phoneNumber}*
+📅 Date: *${messageData.collectionDate}*
+🧪 Tests: *${messageData.selectedTests}*
+
+⚠️ *Action Required:* Assign technician within 2 hours`;
+
+      console.log('🔔 Sending admin WhatsApp notification...');
+      results.admin = await sendWhatsAppMessage(`+${adminWhatsApp}`, adminMessage);
+    }
+
+    console.log('📊 Final Results:');
+    console.log('📱 Customer WhatsApp:', results.whatsapp ? '✅ Sent' : '❌ Failed');
+    console.log('📧 Customer Email:', results.email ? '✅ SENT!' : '❌ Failed');
+    console.log('📧 Admin Email:', results.adminEmail ? '✅ SENT!' : '❌ Failed');
+    console.log('🔔 Admin WhatsApp:', results.admin ? '✅ Sent' : '❌ Failed');
+
+    return results;
+
+  } catch (error) {
+    console.error('❌ Messaging service error:', error);
+    return { whatsapp: false, email: false, admin: false, adminEmail: false };
+  }
+}
 
 module.exports = {
-    processBookingNotifications,
-    sendCustomerNotifications,
-    sendAdminNotifications,
-    sendWhatsAppMessage,
-    sendEmail,
-    sendNotifications: processBookingNotifications // Alias for compatibility
+  sendNotifications,
+  sendWhatsAppMessage,
+  sendEmail
 };
-
-console.log('✅ Messaging service loaded successfully');
