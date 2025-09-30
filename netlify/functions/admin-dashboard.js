@@ -7,25 +7,11 @@ exports.handler = async (event, context) => {
       statusCode: 200,
       headers: {
         'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+        'Access-Control-Allow-Headers': 'Content-Type',
         'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS'
       }
     };
   }
-
-  try {
-    // Verify authentication
-    const authHeader = event.headers.authorization;
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return createErrorResponse(401, 'No token provided');
-    }
-
-    const token = authHeader.substring(7);
-    // Simple token validation (same as other admin endpoints)
-    if (!token || token.length < 10) {
-        return createErrorResponse(401, 'Invalid token');
-    }
-
     
     // Get dashboard statistics
     const stats = await getDashboardStats();
