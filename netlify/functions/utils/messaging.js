@@ -1,5 +1,5 @@
 const https = require('https');
-const nodemailer = require('emailjs');
+const emailjs = require('@emailjs/nodejs');
 
 // WhatsApp Business API Function
 async function sendWhatsAppMessage(phoneNumber, message) {
