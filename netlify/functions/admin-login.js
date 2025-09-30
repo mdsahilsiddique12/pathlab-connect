@@ -1,5 +1,6 @@
 const { createResponse, createErrorResponse } = require('./utils/response');
 const { createSession } = require('./utils/authmiddleware');
+const { prisma } = require('./utils/prisma');
 
 exports.handler = async (event, context) => {
   if (event.httpMethod === 'OPTIONS') {
