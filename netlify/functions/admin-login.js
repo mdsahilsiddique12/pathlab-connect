@@ -38,7 +38,6 @@ exports.handler = async (event, context) => {
        role: 'admin',
        loginTime: new Date()
      });
-     …
     } else {
      console.log('❌ Invalid credentials for:', email);
      return createErrorResponse(401, 'Invalid credentials');
