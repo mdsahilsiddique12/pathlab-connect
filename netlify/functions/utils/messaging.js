@@ -96,7 +96,6 @@ async function sendEmail(recipientEmail, customerName, messageData, isAdmin = fa
         if (isAdmin) {
             // Admin template parameters
             templateParams = {
-                to_email: recipientEmail,
                 subject: `🚨 NEW APPOINTMENT - ${messageData.bookingId}`,
                 booking_id: messageData.bookingId,
                 customer_name: customerName,
