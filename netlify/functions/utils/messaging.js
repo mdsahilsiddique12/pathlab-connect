@@ -152,7 +152,7 @@ async function sendEmail(recipientEmail, customerName, messageData, isAdmin = fa
                 booking_id: messageData.bookingId,
                 customer_name: customerName,
                 customer_phone: messageData.customerPhone,
-                customer_email: messageData.customerEmail,,
+                customer_email: messageData.customerEmail,
                 selected_tests: messageData.selectedTests,
                 collection_date: messageData.collectionDate,
                 time_slot: messageData.timeSlot,
