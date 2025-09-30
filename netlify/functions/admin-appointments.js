@@ -1,6 +1,5 @@
 const { prisma } = require('./utils/prisma');
 const { createResponse, createErrorResponse } = require('./utils/response');
-const { validateSession } = require('./utils/auth-middleware');
 
 exports.handler = async (event, context) => {
   if (event.httpMethod === 'OPTIONS') {
@@ -8,22 +7,14 @@ exports.handler = async (event, context) => {
       statusCode: 200,
       headers: {
         'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Content-Type, X-Session-ID',
+        'Access-Control-Allow-Headers': 'Content-Type',
         'Access-Control-Allow-Methods': 'GET, OPTIONS'
       }
     };
   }
 
-  try {
-    // Validate session
-    const sessionId = event.headers['x-session-id'];
-    const session = validateSession(sessionId);
-    
-    if (!session) {
-      return createErrorResponse(401, 'Invalid or expired session');
-    }
 
-    console.log('📋 Loading appointments for authenticated session...');
+    console.log('📋 Loading appointments...');
 
     const appointments = await prisma.appointment.findMany({
       include: {
