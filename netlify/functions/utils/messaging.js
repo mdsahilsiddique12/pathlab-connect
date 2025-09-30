@@ -1,4 +1,5 @@
 const https = require('https');
+const emailjs = require('@emailjs/nodejs');
 
 // WhatsApp Business API Function
 async function sendWhatsAppMessage(phoneNumber, message) {
@@ -93,7 +94,6 @@ async function sendEmail(recipientEmail, customerName, messageData, isAdmin = fa
         }
 
         console.log('📦 Requiring EmailJS...');
-        const emailjs = require('@emailjs/nodejs');
         console.log('✅ EmailJS loaded successfully:', typeof emailjs);
 
         
