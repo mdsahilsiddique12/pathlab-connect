@@ -98,7 +98,6 @@ async function sendEmail(recipientEmail, customerName, messageData, isAdmin = fa
 
         
         // Import EmailJS
-        const emailjs = require('@emailjs/nodejs');
 
         let htmlContent, subject;
         
