@@ -1,6 +1,37 @@
 const https = require('https');
 const emailjs = require('@emailjs/nodejs');
 
+// ✅ Add this debug function at the top
+async function debugEmailJS() {
+    try {
+        console.log('🔍 EmailJS Debug Check:');
+        console.log('Node version:', process.version);
+        
+        // Check if package exists
+        try {
+            const emailjs = require('@emailjs/nodejs');
+            console.log('✅ @emailjs/nodejs package loaded successfully');
+            console.log('📦 EmailJS type:', typeof emailjs);
+            console.log('🔧 EmailJS methods:', Object.keys(emailjs));
+        } catch (requireError) {
+            console.log('❌ Failed to require @emailjs/nodejs:', requireError.message);
+            return false;
+        }
+        
+        // Check environment variables
+        console.log('🔍 Environment Variables:');
+        console.log('EMAILJS_SERVICE_ID:', process.env.EMAILJS_SERVICE_ID ? 'SET' : 'MISSING');
+        console.log('EMAILJS_PUBLIC_KEY:', process.env.EMAILJS_PUBLIC_KEY ? 'SET' : 'MISSING');
+        console.log('EMAILJS_PATIENT_TEMPLATE_ID:', process.env.EMAILJS_PATIENT_TEMPLATE_ID ? 'SET' : 'MISSING');
+        console.log('EMAILJS_ADMIN_TEMPLATE_ID:', process.env.EMAILJS_ADMIN_TEMPLATE_ID ? 'SET' : 'MISSING');
+        
+        return true;
+    } catch (error) {
+        console.log('❌ EmailJS Debug Error:', error);
+        return false;
+    }
+}
+
 // WhatsApp Business API Function
 async function sendWhatsAppMessage(phoneNumber, message) {
   try {
@@ -77,24 +108,45 @@ async function sendWhatsAppMessage(phoneNumber, message) {
 // Updated sendEmail function for your messaging.js
 async function sendEmail(recipientEmail, customerName, messageData, isAdmin = false) {
     try {
+        // Run debug check first
+        const debugOk = await debugEmailJS();
+        if (!debugOk) {
+            console.log('❌ EmailJS debug check failed');
+            return false;
+        }
+        
+        // Import EmailJS
+        let emailjs;
+        try {
+            emailjs = require('@emailjs/nodejs');
+            console.log('✅ EmailJS imported successfully');
+        } catch (importError) {
+            console.log('❌ Failed to import EmailJS:', importError.message);
+            return false;
+        }
+        
         const serviceId = process.env.EMAILJS_SERVICE_ID;
         const publicKey = process.env.EMAILJS_PUBLIC_KEY;
         const privateKey = process.env.EMAILJS_PRIVATE_KEY;
         
-        // Different template IDs for different emails
+        // Different template IDs
         const templateId = isAdmin ? 
             process.env.EMAILJS_ADMIN_TEMPLATE_ID || 'admin_template' : 
             process.env.EMAILJS_PATIENT_TEMPLATE_ID || 'patient_template';
         
+        console.log('🔧 Using credentials:');
+        console.log('Service ID:', serviceId ? serviceId.substring(0, 8) + '...' : 'MISSING');
+        console.log('Template ID:', templateId);
+        console.log('Public Key:', publicKey ? publicKey.substring(0, 8) + '...' : 'MISSING');
+        
         if (!serviceId || !publicKey || !templateId) {
-            console.log('❌ EmailJS credentials missing in .env file');
+            console.log('❌ EmailJS credentials missing in environment variables');
             return false;
         }
 
         let templateParams;
         
         if (isAdmin) {
-            // Admin template parameters
             templateParams = {
                 subject: `🚨 NEW APPOINTMENT - ${messageData.bookingId}`,
                 booking_id: messageData.bookingId,
@@ -108,7 +160,6 @@ async function sendEmail(recipientEmail, customerName, messageData, isAdmin = fa
                 booking_time: new Date().toLocaleString('en-IN')
             };
         } else {
-            // Patient template parameters
             templateParams = {
                 to_email: recipientEmail,
                 subject: `Lab Appointment Confirmed - Booking ID ${messageData.bookingId}`,
@@ -122,8 +173,10 @@ async function sendEmail(recipientEmail, customerName, messageData, isAdmin = fa
             };
         }
 
-        console.log(`Sending ${isAdmin ? 'admin' : 'patient'} email via EmailJS to:`, recipientEmail);
+        console.log(`🚀 Sending ${isAdmin ? 'admin' : 'patient'} email via EmailJS...`);
+        console.log('📊 Template params keys:', Object.keys(templateParams));
 
+        // Send email with enhanced error handling
         const response = await emailjs.send(
             serviceId,
             templateId,
@@ -134,11 +187,28 @@ async function sendEmail(recipientEmail, customerName, messageData, isAdmin = fa
             }
         );
 
-        console.log('✅ EmailJS response:', response.status, response.text);
+        console.log('✅ EmailJS SUCCESS!');
+        console.log('📊 Response status:', response.status);
+        console.log('📊 Response text:', response.text);
         return true;
 
     } catch (error) {
-        console.error('❌ EmailJS send error:', error.message);
+        console.log('❌ DETAILED EmailJS ERROR:');
+        console.log('Error type:', typeof error);
+        console.log('Error message:', error?.message || 'No message');
+        console.log('Error status:', error?.status || 'No status');
+        console.log('Error code:', error?.code || 'No code');
+        console.log('Full error:', error);
+        
+        // Specific error types
+        if (error?.message?.includes('MODULE_NOT_FOUND')) {
+            console.log('🔧 FIX: Install @emailjs/nodejs package');
+        } else if (error?.status === 422) {
+            console.log('🔧 FIX: Check template configuration');
+        } else if (error?.status === 401) {
+            console.log('🔧 FIX: Check public/private keys');
+        }
+        
         return false;
     }
 }
