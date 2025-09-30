@@ -1,6 +1,5 @@
 const { prisma } = require('./utils/prisma');
 const { createResponse, createErrorResponse } = require('./utils/response');
-const { validateSession } = require('./utils/auth-middleware');
 
 exports.handler = async (event, context) => {
   if (event.httpMethod === 'OPTIONS') {
@@ -8,7 +7,7 @@ exports.handler = async (event, context) => {
       statusCode: 200,
       headers: {
         'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Content-Type, X-Session-ID',
+        'Access-Control-Allow-Headers': 'Content-Type',
         'Access-Control-Allow-Methods': 'POST, OPTIONS'
       }
     };
@@ -18,23 +17,14 @@ exports.handler = async (event, context) => {
     return createErrorResponse(405, 'Method not allowed');
   }
 
-  try {
-    // Validate session
-    const sessionId = event.headers['x-session-id'];
-    const session = validateSession(sessionId);
-    
-    if (!session) {
-      return createErrorResponse(401, 'Invalid or expired session');
-    }
 
     const requestBody = JSON.parse(event.body);
     const { appointmentId, status, notes } = requestBody;
 
-    console.log('📝 Status update request from authenticated session:', { 
-      appointmentId: appointmentId?.substring(0, 8), 
-      status, 
-      notes,
-      sessionUser: session.userId 
+    console.log('📝 Status update request:', {
+       appointmentId: appointmentId?.substring(0, 8),
+       status,
+       notes
     });
 
     if (!appointmentId || !status) {
