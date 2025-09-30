@@ -1,5 +1,4 @@
 const https = require('https');
-const emailjs = require('@emailjs/nodejs');
 
 // WhatsApp Business API Function
 async function sendWhatsAppMessage(phoneNumber, message) {
@@ -76,19 +75,27 @@ async function sendWhatsAppMessage(phoneNumber, message) {
 //// REAL Email Sending Function using EmailJS with HTML content from code
 async function sendEmail(recipientEmail, customerName, messageData, isAdmin = false) {
     try {
-        // EmailJS configuration from environment variables
+        // ✅ ADD THESE DEBUG LOGS
+        console.log('🔍 Environment Variables Check:');
+        console.log('EMAILJS_SERVICE_ID:', process.env.EMAILJS_SERVICE_ID ? 'Present' : '❌ Missing');
+        console.log('EMAILJS_TEMPLATE_ID:', process.env.EMAILJS_TEMPLATE_ID ? 'Present' : '❌ Missing');
+        console.log('EMAILJS_PUBLIC_KEY:', process.env.EMAILJS_PUBLIC_KEY ? 'Present' : '❌ Missing');
+        console.log('EMAILJS_PRIVATE_KEY:', process.env.EMAILJS_PRIVATE_KEY ? 'Present' : '❌ Missing');
+        
         const serviceId = process.env.EMAILJS_SERVICE_ID;
-        const templateId = process.env.EMAILJS_TEMPLATE_ID; // Only ONE template needed
+        const templateId = process.env.EMAILJS_TEMPLATE_ID;
         const publicKey = process.env.EMAILJS_PUBLIC_KEY;
         const privateKey = process.env.EMAILJS_PRIVATE_KEY;
         
         if (!serviceId || !publicKey || !templateId) {
-            console.log('EmailJS credentials missing in .env file');
-            console.log('Required: EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, EMAILJS_PUBLIC_KEY');
+            console.log('❌ EmailJS credentials missing in .env file');
             return false;
         }
 
-        console.log('Setting up EmailJS...');
+        console.log('📦 Requiring EmailJS...');
+        const emailjs = require('@emailjs/nodejs');
+        console.log('✅ EmailJS loaded successfully:', typeof emailjs);
+
         
         // Import EmailJS
         const emailjs = require('@emailjs/nodejs');
