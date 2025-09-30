@@ -152,7 +152,7 @@ async function sendEmail(recipientEmail, customerName, messageData, isAdmin = fa
                 booking_id: messageData.bookingId,
                 customer_name: customerName,
                 customer_phone: messageData.customerPhone,
-                customer_email: recipientEmail,
+                customer_email: messageData.customerEmail,,
                 selected_tests: messageData.selectedTests,
                 collection_date: messageData.collectionDate,
                 time_slot: messageData.timeSlot,
@@ -223,6 +223,7 @@ async function sendNotifications(appointmentData, bookingId) {
     const messageData = {
       customerName: appointmentData.fullName,
       customerPhone: appointmentData.phoneNumber,
+      customerEmail: appointmentData.emailAddress,
       bookingId: bookingId.substring(0, 8).toUpperCase(),
       selectedTests: Array.isArray(appointmentData.tests) ? appointmentData.tests.join(', ') : appointmentData.tests,
       collectionDate: new Date(appointmentData.collectionDate).toLocaleDateString('en-IN'),
