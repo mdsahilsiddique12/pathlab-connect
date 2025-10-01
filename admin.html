@@ -147,14 +147,14 @@
             const [newStatus, setNewStatus] = useState('');
             const [adminNotes, setAdminNotes] = useState('');
             const [isUpdating, setIsUpdating] = useState(false);
-
+        
             useEffect(() => {
                 if (appointment) {
                     setNewStatus(appointment.status || 'PENDING');
-                    setAdminNotes(appointment.admin_notes || '');
+                    setAdminNotes(appointment.admin_notes || appointment.notes || '');
                 }
             }, [appointment]);
-
+        
             const handleStatusUpdate = async () => {
                 if (!appointment || isUpdating) return;
                 
@@ -167,7 +167,24 @@
                 }
                 setIsUpdating(false);
             };
-
+        
+            // Function to view prescription image
+            const viewPrescriptionImage = (imageData) => {
+                if (!imageData) return;
+                
+                const modal = document.getElementById('prescription-modal');
+                const content = document.getElementById('prescription-content');
+                
+                if (modal && content) {
+                    content.innerHTML = `
+                        <h3 class="text-lg font-semibold mb-4">Prescription Image</h3>
+                        <img src="${imageData}" alt="Prescription" class="prescription-image max-w-full h-auto rounded-lg" />
+                    `;
+                    modal.classList.add('show');
+                    modal.style.display = 'flex';
+                }
+            };
+        
             if (!appointment) {
                 return (
                     <div className="text-center py-12 text-gray-500">
@@ -176,9 +193,20 @@
                     </div>
                 );
             }
-
+        
+            const fullAddress = [
+                appointment.address?.houseno,
+                appointment.address?.housename,
+                appointment.address?.street,
+                appointment.address?.locality,
+                appointment.address?.city,
+                appointment.address?.state,
+                appointment.address?.pincode
+            ].filter(Boolean).join(', ') || appointment.address;
+        
             return (
                 <div className="space-y-6">
+                    {/* Header */}
                     <div className="flex justify-between items-start">
                         <div>
                             <h3 className="text-xl font-semibold text-gray-800">{appointment.customer?.fullName || 'N/A'}</h3>
@@ -188,7 +216,8 @@
                             {appointment.status || 'PENDING'}
                         </span>
                     </div>
-
+        
+                    {/* Patient Details */}
                     <div className="space-y-4">
                         <h4 className="font-semibold text-gray-800 flex items-center">
                             <i className="fas fa-user mr-2"></i>
@@ -209,7 +238,8 @@
                             </div>
                         </div>
                     </div>
-
+        
+                    {/* Appointment Details */}
                     <div className="space-y-3">
                         <h4 className="font-semibold text-gray-800 flex items-center">
                             <i className="fas fa-calendar mr-2"></i>
@@ -224,11 +254,12 @@
                             <p className="text-sm flex items-center">
                                 <i className="fas fa-clock mr-3 text-orange-600"></i>
                                 <span className="font-medium">Time Slot:</span>
-                                <span className="ml-2 capitalize">{appointment.timeSlot}</span>
+                                <span className="ml-2 capitalize">{appointment.timeSlot || 'Not specified'}</span>
                             </p>
                         </div>
                     </div>
-
+        
+                    {/* Tests Required */}
                     <div className="space-y-3">
                         <h4 className="font-semibold text-gray-800 flex items-center">
                             <i className="fas fa-vial mr-2"></i>
@@ -244,7 +275,45 @@
                             </div>
                         </div>
                     </div>
-
+        
+                    {/* Prescription Image Section */}
+                    {appointment.prescriptionImage && (
+                        <div className="space-y-3">
+                            <h4 className="font-semibold text-gray-800 flex items-center">
+                                <i className="fas fa-prescription mr-2"></i>
+                                Prescription Image
+                            </h4>
+                            <div className="bg-gray-50 p-4 rounded-lg">
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-center">
+                                        <i className="fas fa-image mr-2 text-green-600"></i>
+                                        <span className="text-sm text-gray-700">Prescription uploaded</span>
+                                    </div>
+                                    <button 
+                                        onClick={() => viewPrescriptionImage(appointment.prescriptionImage)}
+                                        className="neumorph-button shadow-neumorphism px-4 py-2 text-sm text-gray-700 hover:shadow-neumorphism-inset transition-all"
+                                    >
+                                        <i className="fas fa-eye mr-2"></i>View Image
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+        
+                    {/* Address */}
+                    {fullAddress && (
+                        <div className="space-y-3">
+                            <h4 className="font-semibold text-gray-800 flex items-center">
+                                <i className="fas fa-map-marker-alt mr-2"></i>
+                                Collection Address
+                            </h4>
+                            <div className="bg-gray-50 p-4 rounded-lg">
+                                <p className="text-sm text-gray-700">{fullAddress}</p>
+                            </div>
+                        </div>
+                    )}
+        
+                    {/* Patient Notes */}
                     {appointment.notes && (
                         <div className="space-y-3">
                             <h4 className="font-semibold text-gray-800">Patient Notes</h4>
@@ -253,7 +322,8 @@
                             </div>
                         </div>
                     )}
-
+        
+                    {/* Status Update Section */}
                     <div className="space-y-3 pt-4 border-t border-gray-200">
                         <h4 className="font-semibold text-gray-800">Update Status</h4>
                         <div className="space-y-3">
