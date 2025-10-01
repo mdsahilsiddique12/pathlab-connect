@@ -31,11 +31,12 @@ exports.handler = async (event, context) => {
       return createErrorResponse(400, 'appointmentId and status are required');
     }
 
+    // Update using existing notes field instead of admin_notes
     const updatedAppointment = await prisma.appointment.update({
       where: { id: appointmentId },
       data: {
         status,
-        admin_notes: notes || '',
+        notes: notes || '', // ← Use existing notes field for admin updates
         updatedAt: new Date()
       },
       include: {
