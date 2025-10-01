@@ -633,7 +633,29 @@
                 </div>
             );
         }
-
+        // Close prescription modal function
+        function closePrescriptionModal() {
+            const modal = document.getElementById('prescription-modal');
+            if (modal) {
+                modal.classList.remove('show');
+                modal.style.display = 'none';
+            }
+        }
+        
+        // Close modal when clicking outside
+        document.addEventListener('click', function(event) {
+            const modal = document.getElementById('prescription-modal');
+            if (modal && event.target === modal) {
+                closePrescriptionModal();
+            }
+        });
+        
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closePrescriptionModal();
+            }
+        });
         // Use createRoot for React 18
         const root = ReactDOM.createRoot(document.getElementById('root'));
         root.render(<AdminDashboard />);
