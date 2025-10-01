@@ -1,7 +1,7 @@
 const { prisma } = require('./utils/prisma');
 const { createResponse, createErrorResponse } = require('./utils/response');
 
-exports.handler = async (event, _context) => {
+exports.handler = async (event, context) => {
   if (event.httpMethod === 'OPTIONS') {
     return {
       statusCode: 200,
@@ -14,6 +14,7 @@ exports.handler = async (event, _context) => {
   }
 
   try {
+    // Get dashboard statistics (authentication removed)
     const stats = await getDashboardStats();
     const recentAppointments = await getRecentAppointments();
     const todayAppointments = await getTodayAppointments();
@@ -25,15 +26,16 @@ exports.handler = async (event, _context) => {
   }
 };
 
+// Helper functions stay exactly the same
 async function getDashboardStats() {
   const now = new Date();
   const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
-  const endOfDay   = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
+  const endOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
 
   const [
     totalAppointments,
-    todayAppointments,
+    todayAppointments, 
     monthlyAppointments,
     pendingAppointments,
     completedAppointments,
@@ -48,12 +50,12 @@ async function getDashboardStats() {
   ]);
 
   return {
-    total:      totalAppointments,
-    today:      todayAppointments,
-    monthly:    monthlyAppointments,
-    pending:    pendingAppointments,
-    completed:  completedAppointments,
-    customers:  totalCustomers
+    total: totalAppointments,
+    today: todayAppointments,
+    monthly: monthlyAppointments,
+    pending: pendingAppointments,
+    completed: completedAppointments,
+    customers: totalCustomers
   };
 }
 
@@ -70,7 +72,7 @@ async function getRecentAppointments() {
 async function getTodayAppointments() {
   const now = new Date();
   const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
-  const endOfDay   = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
+  const endOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
 
   return prisma.appointment.findMany({
     where: { collectionDate: { gte: startOfDay, lte: endOfDay } },
