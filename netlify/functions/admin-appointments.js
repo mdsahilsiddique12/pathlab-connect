@@ -40,7 +40,7 @@ exports.handler = async (event, context) => {
       status: appointment.status,
       address: appointment.address,
       prescriptionImage: appointment.prescriptionImage,
-      admin_notes: appointment.admin_notes,
+      admin_notes: appointment.notes, // ← Use existing notes field for admin notes
       createdAt: appointment.createdAt,
       updatedAt: appointment.updatedAt,
       customer: appointment.customer
