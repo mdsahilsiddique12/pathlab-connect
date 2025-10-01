@@ -26,7 +26,6 @@ exports.handler = async (event, context) => {
   }
 };
 
-// Helper functions stay exactly the same
 async function getDashboardStats() {
   const now = new Date();
   const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
