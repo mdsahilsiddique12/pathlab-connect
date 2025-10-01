@@ -1,5 +1,4 @@
 const { prisma } = require('./utils/prisma');
-const { createResponse, createErrorResponse } = require('./utils/response');
 
 exports.handler = async (event, context) => {
   if (event.httpMethod === 'OPTIONS') {
@@ -14,15 +13,34 @@ exports.handler = async (event, context) => {
   }
 
   try {
-    // Get dashboard statistics (authentication removed)
+    // Get dashboard statistics
     const stats = await getDashboardStats();
     const recentAppointments = await getRecentAppointments();
     const todayAppointments = await getTodayAppointments();
 
-    return createResponse(200, { stats, recentAppointments, todayAppointments });
+    // Return direct object - server.js will wrap it
+    return {
+      statusCode: 200,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ 
+        stats, 
+        recentAppointments, 
+        todayAppointments 
+      })
+    };
   } catch (error) {
     console.error('Dashboard error:', error);
-    return createErrorResponse(500, 'Failed to load dashboard data');
+    return {
+      statusCode: 500,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ error: 'Failed to load dashboard data' })
+    };
   }
 };
 
