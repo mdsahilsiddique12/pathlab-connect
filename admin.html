@@ -45,7 +45,16 @@
 </head>
 <body class="bg-gray-100">
     <div id="root"></div>
-    
+    <div id="prescription-modal" class="prescription-modal">
+        <div class="prescription-viewer p-6">
+            <button onclick="closePrescriptionModal()" class="absolute top-4 right-4 bg-red-500 text-white px-3 py-1 rounded-full hover:bg-red-600 transition-colors z-10">
+                <i class="fas fa-times"></i>
+            </button>
+            <div id="prescription-content">
+            </div>
+        </div>
+    </div>
+
     <script type="text/babel">
         const { useState, useEffect } = React;
 
@@ -290,8 +299,22 @@
                                         <span className="text-sm text-gray-700">Prescription uploaded</span>
                                     </div>
                                     <button 
-                                        onClick={() => viewPrescriptionImage(appointment.prescriptionImage)}
+                                        onClick={() => {
+                                            const modal = document.getElementById('prescription-modal');
+                                            const content = document.getElementById('prescription-content');
+                                            if (modal && content) {
+                                                content.innerHTML = `
+                                                    <h3 class="text-lg font-semibold mb-4 text-gray-800">Prescription Image</h3>
+                                                    <div class="max-w-4xl max-h-96 overflow-auto">
+                                                        <img src="${appointment.prescriptionImage}" alt="Prescription" class="w-full h-auto rounded-lg shadow-lg" />
+                                                    </div>
+                                                `;
+                                                modal.style.display = 'flex';
+                                                modal.classList.add('show');
+                                            }
+                                        }}
                                         className="neumorph-button shadow-neumorphism px-4 py-2 text-sm text-gray-700 hover:shadow-neumorphism-inset transition-all"
+                                        type="button"
                                     >
                                         <i className="fas fa-eye mr-2"></i>View Image
                                     </button>
@@ -299,6 +322,7 @@
                             </div>
                         </div>
                     )}
+
         
                     {/* Address */}
                     {fullAddress && (
@@ -633,26 +657,24 @@
                 </div>
             );
         }
-        // Close prescription modal function
         function closePrescriptionModal() {
             const modal = document.getElementById('prescription-modal');
             if (modal) {
-                modal.classList.remove('show');
                 modal.style.display = 'none';
+                modal.classList.remove('show');
             }
         }
         
-        // Close modal when clicking outside
-        document.addEventListener('click', function(event) {
-            const modal = document.getElementById('prescription-modal');
-            if (modal && event.target === modal) {
+        // Close when clicking outside
+        document.addEventListener('click', (e) => {
+            if (e.target.id === 'prescription-modal') {
                 closePrescriptionModal();
             }
         });
         
-        // Close modal with Escape key
-        document.addEventListener('keydown', function(event) {
-            if (event.key === 'Escape') {
+        // Close with Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
                 closePrescriptionModal();
             }
         });
