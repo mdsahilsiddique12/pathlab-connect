@@ -1,6 +1,6 @@
 const { createResponse } = require('./utils/response');
 
-exports.handler = async (event, _context) => {
+exports.handler = async (event, context) => {
   if (event.httpMethod === 'OPTIONS') {
     return {
       statusCode: 200,
@@ -12,8 +12,9 @@ exports.handler = async (event, _context) => {
     };
   }
 
+  // Always return success since authentication is disabled
   return createResponse(200, {
     success: true,
-    message: 'Login not required – dashboard is public'
+    message: 'Authentication disabled - dashboard is public'
   });
 };
