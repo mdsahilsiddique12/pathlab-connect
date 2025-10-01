@@ -1,5 +1,4 @@
 const { prisma } = require('./utils/prisma');
-const { createResponse, createErrorResponse } = require('./utils/response');
 
 exports.handler = async (event, context) => {
   if (event.httpMethod === 'OPTIONS') {
@@ -14,7 +13,14 @@ exports.handler = async (event, context) => {
   }
 
   if (event.httpMethod !== 'POST') {
-    return createErrorResponse(405, 'Method not allowed');
+    return {
+      statusCode: 405,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ error: 'Method not allowed' })
+    };
   }
 
   try {
@@ -28,7 +34,14 @@ exports.handler = async (event, context) => {
     });
 
     if (!appointmentId || !status) {
-      return createErrorResponse(400, 'appointmentId and status are required');
+      return {
+        statusCode: 400,
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ error: 'appointmentId and status are required' })
+      };
     }
 
     // Update using existing notes field instead of admin_notes
@@ -36,7 +49,7 @@ exports.handler = async (event, context) => {
       where: { id: appointmentId },
       data: {
         status,
-        notes: notes || '', // ← Use existing notes field for admin updates
+        notes: notes || '', // Use existing notes field for admin updates
         updatedAt: new Date()
       },
       include: {
@@ -50,14 +63,28 @@ exports.handler = async (event, context) => {
       }
     });
 
-    return createResponse(200, {
-      success: true,
-      message: 'Status updated successfully',
-      data: { appointment: updatedAppointment }
-    });
+    return {
+      statusCode: 200,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        success: true,
+        message: 'Status updated successfully',
+        data: { appointment: updatedAppointment }
+      })
+    };
 
   } catch (error) {
     console.error('❌ Update status error:', error);
-    return createErrorResponse(500, 'Failed to update status');
+    return {
+      statusCode: 500,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ error: 'Failed to update status' })
+    };
   }
 };
