@@ -1,5 +1,4 @@
 const { prisma } = require('./utils/prisma');
-const { createResponse, createErrorResponse } = require('./utils/response');
 
 exports.handler = async (event, context) => {
   if (event.httpMethod === 'OPTIONS') {
@@ -40,15 +39,33 @@ exports.handler = async (event, context) => {
       status: appointment.status,
       address: appointment.address,
       prescriptionImage: appointment.prescriptionImage,
-      admin_notes: appointment.notes, // ← Use existing notes field for admin notes
+      admin_notes: appointment.notes, // Use existing notes field
       createdAt: appointment.createdAt,
       updatedAt: appointment.updatedAt,
       customer: appointment.customer
     }));
 
-    return createResponse(200, { success: true, data: { appointments: transformedAppointments } });
+    // Return direct object - server.js will wrap it
+    return {
+      statusCode: 200,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ 
+        success: true, 
+        data: { appointments: transformedAppointments } 
+      })
+    };
   } catch (error) {
     console.error('❌ Appointments error:', error);
-    return createErrorResponse(500, 'Failed to load appointments');
+    return {
+      statusCode: 500,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ error: 'Failed to load appointments' })
+    };
   }
 };
