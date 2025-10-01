@@ -1,7 +1,7 @@
 const { prisma } = require('./utils/prisma');
 const { createResponse, createErrorResponse } = require('./utils/response');
 
-exports.handler = async (event, _context) => {
+exports.handler = async (event, context) => {
   if (event.httpMethod === 'OPTIONS') {
     return {
       statusCode: 200,
@@ -17,28 +17,36 @@ exports.handler = async (event, _context) => {
     console.log('📋 Loading appointments...');
     const appointments = await prisma.appointment.findMany({
       include: {
-        customer: { select: { fullName: true, phone: true, email: true } }
+        customer: {
+          select: {
+            fullName: true,
+            phone: true,
+            email: true
+          }
+        }
       },
-      orderBy: { createdAt: 'desc' }
+      orderBy: {
+        createdAt: 'desc'
+      }
     });
 
-    const transformed = appointments.map(a => ({
-      id:               a.id,
-      customerId:       a.customerId,
-      collectionDate:   a.collectionDate,
-      timeSlot:         a.timeSlot,
-      tests:            a.tests,
-      notes:            a.notes,
-      status:           a.status,
-      address:          a.address,
-      prescriptionImage:a.prescriptionImage,
-      admin_notes:      a.admin_notes,
-      createdAt:        a.createdAt,
-      updatedAt:        a.updatedAt,
-      customer:         a.customer
+    const transformedAppointments = appointments.map(appointment => ({
+      id: appointment.id,
+      customerId: appointment.customerId,
+      collectionDate: appointment.collectionDate,
+      timeSlot: appointment.timeSlot,
+      tests: appointment.tests,
+      notes: appointment.notes,
+      status: appointment.status,
+      address: appointment.address,
+      prescriptionImage: appointment.prescriptionImage,
+      admin_notes: appointment.admin_notes,
+      createdAt: appointment.createdAt,
+      updatedAt: appointment.updatedAt,
+      customer: appointment.customer
     }));
 
-    return createResponse(200, { success: true, data: { appointments: transformed } });
+    return createResponse(200, { success: true, data: { appointments: transformedAppointments } });
   } catch (error) {
     console.error('❌ Appointments error:', error);
     return createErrorResponse(500, 'Failed to load appointments');
