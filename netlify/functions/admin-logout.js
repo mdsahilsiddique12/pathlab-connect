@@ -1,6 +1,6 @@
-const { createResponse, createErrorResponse } = require('./utils/response');
+const { createResponse } = require('./utils/response');
 
-exports.handler = async (event, context) => {
+exports.handler = async (event, _context) => {
   if (event.httpMethod === 'OPTIONS') {
     return {
       statusCode: 200,
@@ -12,14 +12,8 @@ exports.handler = async (event, context) => {
     };
   }
 
-  if (event.httpMethod !== 'POST') {
-    return createErrorResponse(405, 'Method not allowed');
-  }
-
-    return createResponse(200, { success: true, message: 'Logout endpoint disabled (no auth)' });
-
-  } catch (error) {
-    console.error('❌ Logout error:', error);
-    return createErrorResponse(500, 'Logout failed');
-  }
+  return createResponse(200, {
+    success: true,
+    message: 'Logout endpoint disabled – no authentication in use'
+  });
 };
