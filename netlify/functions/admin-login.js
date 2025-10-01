@@ -1,6 +1,6 @@
-const { createResponse, createErrorResponse } = require('./utils/response');
+const { createResponse } = require('./utils/response');
 
-exports.handler = async (event, context) => {
+exports.handler = async (event, _context) => {
   if (event.httpMethod === 'OPTIONS') {
     return {
       statusCode: 200,
@@ -12,13 +12,8 @@ exports.handler = async (event, context) => {
     };
   }
 
-
-
-
-      return createResponse(200, { success: true, message: 'Login no longer required' });
-
-  } catch (error) {
-    console.error('❌ Login error:', error);
-    return createErrorResponse(500, 'Login failed');
-  }
+  return createResponse(200, {
+    success: true,
+    message: 'Login not required – dashboard is public'
+  });
 };
