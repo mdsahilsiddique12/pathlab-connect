@@ -34,10 +34,9 @@
             padding: 0 20px;
             display: flex;
             align-items: center;
-            justify-content: space-between;
+            justify-content: center;
             gap: 20px;
         }
-
         
         .logo-container {
             display: flex;
@@ -620,7 +619,7 @@
             }
         }
 
-        /* Confirmation Modal Styles - COMPACT VERSION */
+        /* Confirmation Modal Styles */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -633,26 +632,23 @@
             justify-content: center;
             z-index: 1000;
             backdrop-filter: blur(4px);
-            padding: 20px;
-            box-sizing: border-box;
         }
-        
+
         .modal-overlay.show {
             display: flex;
         }
-        
+
         .confirmation-modal {
             background: white;
-            border-radius: 20px;
-            width: 100%;
-            max-width: 450px;
-            max-height: 90vh;
+            border-radius: 24px;
+            width: 90%;
+            max-width: 500px;
             position: relative;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
             animation: modalSlideIn 0.3s ease-out;
-            overflow-y: auto;
+            overflow: hidden;
         }
-        
+
         @keyframes modalSlideIn {
             from {
                 opacity: 0;
@@ -663,18 +659,18 @@
                 transform: translateY(0) scale(1);
             }
         }
-        
+
         .modal-close {
             position: absolute;
-            top: 12px;
-            right: 16px;
+            top: 16px;
+            right: 20px;
             background: none;
             border: none;
-            font-size: 20px;
+            font-size: 24px;
             color: #9ca3af;
             cursor: pointer;
-            width: 28px;
-            height: 28px;
+            width: 32px;
+            height: 32px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -682,118 +678,117 @@
             transition: all 0.2s ease;
             z-index: 10;
         }
-        
+
         .modal-close:hover {
             background: #f3f4f6;
             color: #374151;
         }
-        
+
         .modal-header {
             text-align: center;
-            padding: 30px 24px 20px 24px;
+            padding: 40px 40px 24px 40px;
             background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
         }
-        
+
         .success-icon {
-            width: 60px;
-            height: 60px;
+            width: 80px;
+            height: 80px;
             background: linear-gradient(135deg, #10b981, #059669);
             border-radius: 50%;
-            margin: 0 auto 16px auto;
+            margin: 0 auto 24px auto;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 6px 24px rgba(16, 185, 129, 0.3);
+            box-shadow: 0 8px 32px rgba(16, 185, 129, 0.3);
         }
-        
+
         .success-icon::before {
             content: '✓';
             color: white;
-            font-size: 28px;
+            font-size: 36px;
             font-weight: bold;
         }
-        
+
         .modal-title {
-            font-size: 24px;
+            font-size: 28px;
             font-weight: 700;
             color: #1f2937;
-            margin: 0 0 6px 0;
+            margin: 0 0 8px 0;
         }
-        
+
         .modal-subtitle {
-            font-size: 14px;
+            font-size: 16px;
             color: #6b7280;
             margin: 0;
         }
-        
+
         .modal-body {
-            padding: 20px 24px;
+            padding: 24px 40px;
         }
-        
+
         .appointment-details {
             background: #f8fafc;
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 16px;
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
             border: 1px solid #e2e8f0;
         }
-        
+
         .appointment-details h3 {
-            font-size: 16px;
+            font-size: 18px;
             font-weight: 600;
             color: #1f2937;
-            margin: 0 0 12px 0;
+            margin: 0 0 16px 0;
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
         }
-        
+
         .appointment-info {
             display: flex;
             flex-direction: column;
-            gap: 2px;
+            gap: 4px;
         }
-        
+
         .appointment-date {
             color: #1f2937;
             font-weight: 600;
-            font-size: 14px;
+            font-size: 16px;
         }
-        
+
         .appointment-time {
             color: #6b7280;
-            font-size: 13px;
-        }
-        
-        .next-steps {
-            margin-bottom: 16px;
-        }
-        
-        .next-steps h3 {
             font-size: 14px;
+        }
+
+        .next-steps {
+            margin-bottom: 24px;
+        }
+
+        .next-steps h3 {
+            font-size: 16px;
             font-weight: 600;
             color: #3b82f6;
-            margin: 0 0 10px 0;
+            margin: 0 0 16px 0;
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
         }
-        
+
         .steps-list {
             list-style: none;
             padding: 0;
             margin: 0;
         }
-        
+
         .steps-list li {
-            padding: 4px 0;
+            padding: 6px 0;
             color: #4b5563;
-            font-size: 13px;
+            font-size: 14px;
             position: relative;
             padding-left: 12px;
-            line-height: 1.4;
         }
-        
+
         .steps-list li::before {
             content: '•';
             color: #3b82f6;
@@ -801,141 +796,95 @@
             position: absolute;
             left: 0;
         }
-        
+
         .contact-methods {
-            margin-bottom: 16px;
+            margin-bottom: 24px;
         }
-        
+
         .contact-methods p {
-            font-size: 13px;
+            font-size: 14px;
             color: #4b5563;
-            margin: 0 0 8px 0;
+            margin: 0 0 12px 0;
             font-weight: 500;
         }
-        
+
         .contact-icons {
             display: flex;
-            gap: 16px;
+            gap: 24px;
             align-items: center;
         }
-        
+
         .contact-method {
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
             color: #6b7280;
-            font-size: 12px;
+            font-size: 14px;
         }
-        
+
         .confirmation-email {
             display: flex;
             align-items: center;
             gap: 8px;
-            padding: 10px 14px;
+            padding: 12px 16px;
             background: #f0fdf4;
             border: 1px solid #bbf7d0;
-            border-radius: 10px;
-            margin-bottom: 16px;
+            border-radius: 12px;
+            margin-bottom: 24px;
         }
-        
+
         .confirmation-email .check-icon {
             color: #10b981;
             font-weight: bold;
         }
-        
+
         .confirmation-email span {
             color: #065f46;
-            font-size: 12px;
+            font-size: 14px;
         }
-        
+
         .modal-footer {
-            padding: 0 24px 24px 24px;
+            padding: 0 40px 32px 40px;
         }
-        
+
         .modal-close-btn {
             width: 100%;
-            padding: 12px 20px;
+            padding: 14px 24px;
             background: #e5e7eb;
             color: #374151;
             border: none;
-            border-radius: 10px;
-            font-size: 14px;
+            border-radius: 12px;
+            font-size: 16px;
             font-weight: 500;
             cursor: pointer;
             transition: all 0.2s ease;
         }
-        
+
         .modal-close-btn:hover {
             background: #d1d5db;
         }
-        
-        /* Mobile optimizations */
+
         @media (max-width: 640px) {
-            .modal-overlay {
-                padding: 10px;
-            }
-            
             .confirmation-modal {
-                width: 100%;
-                max-width: 100%;
-                max-height: 95vh;
+                width: 95%;
+                margin: 20px;
             }
             
-            .modal-header {
-                padding: 20px 16px 16px 16px;
-            }
-            
-            .modal-body {
-                padding: 16px;
-            }
-            
+            .modal-header,
+            .modal-body,
             .modal-footer {
-                padding: 0 16px 16px 16px;
+                padding-left: 24px;
+                padding-right: 24px;
             }
             
             .modal-title {
-                font-size: 20px;
-            }
-            
-            .success-icon {
-                width: 50px;
-                height: 50px;
-            }
-            
-            .success-icon::before {
                 font-size: 24px;
             }
         }
-        
-        /* Very small screens */
-        @media (max-width: 480px) {
-            .confirmation-modal {
-                max-height: 98vh;
-            }
-            
-            .modal-header {
-                padding: 16px 12px 12px 12px;
-            }
-            
-            .modal-body {
-                padding: 12px;
-            }
-            
-            .modal-footer {
-                padding: 0 12px 12px 12px;
-            }
-        }
-
-
 
         /* Home Button Styles */
         .nav-section {
-            flex: 0 0 auto;
-        }
-
-        .nav-spacer {
-            flex: 0 0 auto;
-            width: 120px; /* Same width as home button to balance */
+            margin-right: auto;
         }
 
         .home-btn {
@@ -968,16 +917,236 @@
                 justify-content: space-between;
             }
             
-            .nav-spacer {
-                display: none;
-            }
-            
             .home-btn span:not(.home-icon) {
                 display: none;
             }
-            
-            .home-btn {
-                padding: 8px 12px;
+        }
+
+
+    
+        /* Custom Tests Input Section */
+        .custom-tests-section {
+            border-top: 2px solid #e5e7eb;
+            padding-top: 24px;
+            margin-top: 24px;
+            background: #fafbfc;
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .custom-tests-header {
+            margin-bottom: 16px;
+            text-align: center;
+        }
+
+        .custom-tests-header h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1f2937;
+            margin: 0 0 6px 0;
+        }
+
+        .custom-tests-header p {
+            font-size: 14px;
+            color: #6b7280;
+            margin: 0;
+        }
+
+        .custom-input-container {
+            position: relative;
+        }
+
+        .custom-input-container textarea {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            font-size: 15px;
+            font-family: inherit;
+            resize: vertical;
+            transition: all 0.2s ease;
+            background: white;
+        }
+
+        .custom-input-container textarea:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .input-help-text {
+            font-size: 13px;
+            color: #6b7280;
+            margin-top: 10px;
+            padding-left: 4px;
+            font-style: italic;
+        }
+
+        /* Enhanced Test Selection */
+        .test-item {
+            position: relative;
+            border: 2px solid #e5e7eb !important;
+            border-radius: 12px;
+            padding: 16px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        .test-item:hover {
+            border-color: #3b82f6 !important;
+            background: #f8faff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(59, 130, 246, 0.15);
+        }
+
+        .test-item.selected {
+            border-color: #10b981 !important;
+            background: #ecfdf5 !important;
+            box-shadow: 0 4px 16px rgba(16, 185, 129, 0.2);
+        }
+
+        .test-checkbox {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            width: 20px;
+            height: 20px;
+            accent-color: #10b981;
+            cursor: pointer;
+        }
+
+        .test-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 4px;
+            padding-right: 30px;
+        }
+
+        .test-desc {
+            font-size: 13px;
+            color: #6b7280;
+            margin-bottom: 8px;
+        }
+
+        .test-price {
+            font-size: 14px;
+            font-weight: 600;
+            color: #059669;
+        }
+
+        /* Selected Tests Summary */
+        .selected-tests-summary {
+            border-top: 2px solid #e5e7eb;
+            padding-top: 20px;
+            margin-top: 20px;
+            background: #f0fdf4;
+            border-radius: 12px;
+            padding: 16px;
+        }
+
+        .summary-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .summary-header h4 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1f2937;
+            margin: 0;
+        }
+
+        .clear-all {
+            font-size: 14px;
+            color: #ef4444;
+            cursor: pointer;
+            text-decoration: underline;
+            padding: 4px 8px;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .clear-all:hover {
+            background: #fef2f2;
+            color: #dc2626;
+        }
+
+        .selected-items {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .selected-tag {
+            background: #eff6ff;
+            color: #1d4ed8;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            border: 1px solid #bfdbfe;
+        }
+
+        .selected-tag .remove-tag {
+            cursor: pointer;
+            color: #ef4444;
+            font-weight: bold;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .selected-tag .remove-tag:hover {
+            background: #fee2e2;
+        }
+
+        .estimated-total {
+            text-align: center;
+            font-size: 16px;
+            color: #059669;
+            padding: 10px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #bbf7d0;
+        }
+
+        @media (max-width: 768px) {
+            .custom-tests-section {
+                padding: 16px;
+                margin-top: 16px;
+            }
+
+            .custom-input-container textarea {
+                font-size: 14px;
+            }
+
+            .test-grid {
+                grid-template-columns: 1fr !important;
+                gap: 12px;
+            }
+
+            .selected-items {
+                justify-content: center;
+            }
+
+            .summary-header {
+                flex-direction: column;
+                align-items: center;
+                gap: 8px;
             }
         }
 
@@ -988,11 +1157,11 @@
     <header class="top-header">
         <div class="header-content">
             <div class="nav-section">
-                <a href="https://uniquepathlab.netlify.app" class="home-btn">
+                <a href="https://example.com" class="home-btn">
                     <span class="home-icon">🏠</span>
                     <span>Home</span>
                 </a>
-            </div>
+                </div>
             <div class="logo-container">
                 <div class="logo-icon">
                     🔬
@@ -1002,7 +1171,6 @@
                     <div class="company-tagline">Booking of Unique Path Lab</div>
                 </div>
             </div>
-            <div class="nav-spacer"></div>
         </div>
     </header>
 
@@ -1069,7 +1237,37 @@
                                     <strong>Note:</strong> Please provide either phone number or email address for appointment confirmations and updates.
                                 </span>
                             </div>
+                        
+                        <!-- Custom Tests Input Section -->
+                        <div class="custom-tests-section">
+                            <div class="custom-tests-header">
+                                <h3>Additional Tests</h3>
+                                <p>Enter any other tests you need (separate multiple tests with commas)</p>
+                            </div>
+
+                            <div class="custom-input-container">
+                                <textarea id="customTests" name="customTests" 
+                                         placeholder="e.g., Vitamin D, HbA1c, Urine Routine, X-Ray Chest, ESR, CRP, etc."
+                                         rows="3"></textarea>
+                                <div class="input-help-text">
+                                    💡 Enter test names separated by commas. Our team will confirm availability and pricing.
+                                </div>
+                            </div>
                         </div>
+
+                        <!-- Selected Tests Summary -->
+                        <div class="selected-tests-summary" id="selectedTestsSummary" style="display: none;">
+                            <div class="summary-header">
+                                <h4>Selected Tests</h4>
+                                <span class="clear-all" onclick="clearAllSelectedTests()">Clear All</span>
+                            </div>
+                            <div class="selected-items" id="selectedTestsList"></div>
+                            <div class="estimated-total">
+                                <strong>Total Selected: <span id="selectedTestsCount">0</span> tests</strong>
+                            </div>
+                        </div>
+
+                    </div>
                     </div>
 
                     <!-- Section 2: Test Selection -->
@@ -1398,12 +1596,30 @@
             const result = await response.json();
             
             if (response.ok && result.success) {
-                // Show modal instead of inline message
-                showConfirmationModal(formData, result.bookingId);
+                // Show success message
+                successMsg.innerHTML = `
+                    <strong>✅ Booking Confirmed!</strong><br>
+                    Your appointment has been booked successfully.<br>
+                    <strong>Booking ID:</strong> ${result.bookingId}<br>
+                    You will receive confirmation within 2 hours.
+                `;
+                successMsg.style.display = 'block';
+                
+                // Reset form AFTER success
+                setTimeout(() => {
+                    document.getElementById('bookingForm').reset();
+                    prescriptionImageData = null;
+                    document.getElementById('fileName').style.display = 'none';
+                    document.querySelectorAll('.test-item').forEach(item => {
+                        item.classList.remove('selected');
+                        item.querySelector('.test-checkbox').checked = false;
+                    });
+                }, 1000);
+                
+                successMsg.scrollIntoView({ behavior: 'smooth' });
             } else {
                 throw new Error(result.message || 'Booking failed');
             }
-
         } catch (error) {
             console.error('❌ Booking error:', error);
             showError('Failed to book appointment. Please try again or contact us at +91-79798-06128');
@@ -1457,39 +1673,6 @@
         };
     }
 
-    // Modal functions
-    function showConfirmationModal(formData, bookingId) {
-        const appointmentDate = new Date(formData.collectionDate);
-        document.getElementById('modalAppointmentDate').textContent = 
-            appointmentDate.toLocaleDateString('en-US', {
-                weekday: 'long',
-                year: 'numeric', 
-                month: 'long',
-                day: 'numeric'
-            });
-        
-        document.getElementById('modalTimeSlot').textContent = 
-            formData.timeSlot.charAt(0).toUpperCase() + formData.timeSlot.slice(1) + ' Slot';
-        
-        if (formData.emailAddress) {
-            document.getElementById('modalEmail').textContent = formData.emailAddress;
-        }
-        
-        document.getElementById('confirmationModal').classList.add('show');
-    }
-
-    function closeConfirmationModal() {
-        document.getElementById('confirmationModal').classList.remove('show');
-        document.getElementById('bookingForm').reset();
-        prescriptionImageData = null;
-        document.getElementById('fileName').style.display = 'none';
-        document.querySelectorAll('.test-item').forEach(item => {
-            item.classList.remove('selected');
-            item.querySelector('.test-checkbox').checked = false;
-        });
-    }
-
-
     function formatAddress() {
         const addressParts = [
             document.getElementById('houseNo').value.trim(),
@@ -1522,8 +1705,170 @@
     document.getElementById('prescription').addEventListener('change', function() {
         handlePrescriptionUpload(this);
     });
-    </script>
+    
 
+    // Enhanced Test Selection Functionality
+    const customTestsInput = document.getElementById('customTests');
+    const selectedTestsSummary = document.getElementById('selectedTestsSummary');
+    const selectedTestsList = document.getElementById('selectedTestsList');
+    const selectedTestsCount = document.getElementById('selectedTestsCount');
+
+    // Make test items clickable and checkboxes functional
+    document.querySelectorAll('.test-item').forEach(item => {
+        const checkbox = item.querySelector('.test-checkbox');
+
+        // Make the entire card clickable
+        item.addEventListener('click', function(e) {
+            if (e.target !== checkbox) {
+                checkbox.checked = !checkbox.checked;
+                toggleTestSelection(item, checkbox);
+            }
+        });
+
+        // Handle direct checkbox clicks
+        checkbox.addEventListener('change', function() {
+            toggleTestSelection(item, checkbox);
+        });
+
+        // Initialize visual state
+        if (checkbox.checked) {
+            item.classList.add('selected');
+        }
+    });
+
+    function toggleTestSelection(item, checkbox) {
+        if (checkbox.checked) {
+            item.classList.add('selected');
+        } else {
+            item.classList.remove('selected');
+        }
+        updateSelectedTestsSummary();
+    }
+
+    // Handle custom tests input
+    if (customTestsInput) {
+        customTestsInput.addEventListener('input', function() {
+            updateSelectedTestsSummary();
+        });
+    }
+
+    function updateSelectedTestsSummary() {
+        const selectedTests = [];
+        let totalCount = 0;
+
+        // Get selected checkbox tests
+        document.querySelectorAll('.test-checkbox:checked').forEach(checkbox => {
+            const testName = checkbox.dataset.test || checkbox.value;
+            selectedTests.push({
+                name: testName,
+                type: 'preset',
+                element: checkbox
+            });
+            totalCount++;
+        });
+
+        // Get custom tests
+        if (customTestsInput && customTestsInput.value.trim()) {
+            const customTests = customTestsInput.value.trim();
+            const customTestArray = customTests.split(',').map(test => test.trim()).filter(test => test);
+            customTestArray.forEach(test => {
+                selectedTests.push({
+                    name: test,
+                    type: 'custom'
+                });
+                totalCount++;
+            });
+        }
+
+        // Update summary display
+        if (selectedTestsSummary && selectedTestsList && selectedTestsCount) {
+            if (selectedTests.length > 0) {
+                selectedTestsSummary.style.display = 'block';
+                selectedTestsList.innerHTML = selectedTests.map(test => `
+                    <div class="selected-tag">
+                        ${test.name}
+                        <span class="remove-tag" onclick="removeSelectedTest('${test.name}', '${test.type}')">&times;</span>
+                    </div>
+                `).join('');
+                selectedTestsCount.textContent = totalCount;
+            } else {
+                selectedTestsSummary.style.display = 'none';
+            }
+        }
+    }
+
+    // Remove individual test
+    window.removeSelectedTest = function(testName, type) {
+        if (type === 'preset') {
+            const checkbox = document.querySelector(`input[data-test="${testName}"], input[value="${testName}"]`);
+            if (checkbox) {
+                checkbox.checked = false;
+                const item = checkbox.closest('.test-item');
+                if (item) {
+                    item.classList.remove('selected');
+                }
+            }
+        } else if (customTestsInput && type === 'custom') {
+            const currentTests = customTestsInput.value.split(',').map(t => t.trim());
+            const updatedTests = currentTests.filter(t => t !== testName);
+            customTestsInput.value = updatedTests.join(', ');
+        }
+        updateSelectedTestsSummary();
+    };
+
+    // Clear all selections
+    window.clearAllSelectedTests = function() {
+        // Clear checkboxes
+        document.querySelectorAll('.test-checkbox').forEach(checkbox => {
+            checkbox.checked = false;
+            const item = checkbox.closest('.test-item');
+            if (item) {
+                item.classList.remove('selected');
+            }
+        });
+
+        // Clear custom input
+        if (customTestsInput) {
+            customTestsInput.value = '';
+        }
+
+        updateSelectedTestsSummary();
+    };
+
+    // Update form data collection to include all selected tests
+    const originalCollectFormData = window.collectFormData;
+
+    window.collectFormData = function() {
+        const data = originalCollectFormData ? originalCollectFormData() : {};
+
+        // Combine all selected tests
+        const allTests = [];
+
+        // Add selected preset tests
+        document.querySelectorAll('.test-checkbox:checked').forEach(checkbox => {
+            const testName = checkbox.dataset.test || checkbox.value;
+            allTests.push(testName);
+        });
+
+        // Add custom tests
+        if (customTestsInput && customTestsInput.value.trim()) {
+            const customTests = customTestsInput.value.trim();
+            const customTestArray = customTests.split(',').map(test => test.trim()).filter(test => test);
+            allTests.push(...customTestArray);
+        }
+
+        // Update the testsRequested field or create it
+        data.testsRequested = allTests.join(', ');
+
+        return data;
+    };
+
+    // Initialize on page load
+    setTimeout(function() {
+        updateSelectedTestsSummary();
+    }, 500);
+
+    </script>
     <!-- Confirmation Modal -->
     <div id="confirmationModal" class="modal-overlay">
         <div class="confirmation-modal">
@@ -1573,7 +1918,8 @@
             </div>
         </div>
     </div>
-    
+
+
 </body>
 </html>
 
