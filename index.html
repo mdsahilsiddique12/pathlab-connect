@@ -34,9 +34,10 @@
             padding: 0 20px;
             display: flex;
             align-items: center;
-            justify-content: center;
+            justify-content: space-between;
             gap: 20px;
         }
+
         
         .logo-container {
             display: flex;
@@ -618,12 +619,336 @@
                 transform: rotate(360deg);
             }
         }
+
+        /* Confirmation Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        .confirmation-modal {
+            background: white;
+            border-radius: 24px;
+            width: 90%;
+            max-width: 500px;
+            position: relative;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            animation: modalSlideIn 0.3s ease-out;
+            overflow: hidden;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 16px;
+            right: 20px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: #9ca3af;
+            cursor: pointer;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+            z-index: 10;
+        }
+
+        .modal-close:hover {
+            background: #f3f4f6;
+            color: #374151;
+        }
+
+        .modal-header {
+            text-align: center;
+            padding: 40px 40px 24px 40px;
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+        }
+
+        .success-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #10b981, #059669);
+            border-radius: 50%;
+            margin: 0 auto 24px auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 32px rgba(16, 185, 129, 0.3);
+        }
+
+        .success-icon::before {
+            content: '✓';
+            color: white;
+            font-size: 36px;
+            font-weight: bold;
+        }
+
+        .modal-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: #1f2937;
+            margin: 0 0 8px 0;
+        }
+
+        .modal-subtitle {
+            font-size: 16px;
+            color: #6b7280;
+            margin: 0;
+        }
+
+        .modal-body {
+            padding: 24px 40px;
+        }
+
+        .appointment-details {
+            background: #f8fafc;
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .appointment-details h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1f2937;
+            margin: 0 0 16px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .appointment-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .appointment-date {
+            color: #1f2937;
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .appointment-time {
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+        .next-steps {
+            margin-bottom: 24px;
+        }
+
+        .next-steps h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #3b82f6;
+            margin: 0 0 16px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .steps-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .steps-list li {
+            padding: 6px 0;
+            color: #4b5563;
+            font-size: 14px;
+            position: relative;
+            padding-left: 12px;
+        }
+
+        .steps-list li::before {
+            content: '•';
+            color: #3b82f6;
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+        }
+
+        .contact-methods {
+            margin-bottom: 24px;
+        }
+
+        .contact-methods p {
+            font-size: 14px;
+            color: #4b5563;
+            margin: 0 0 12px 0;
+            font-weight: 500;
+        }
+
+        .contact-icons {
+            display: flex;
+            gap: 24px;
+            align-items: center;
+        }
+
+        .contact-method {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+        .confirmation-email {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 16px;
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            border-radius: 12px;
+            margin-bottom: 24px;
+        }
+
+        .confirmation-email .check-icon {
+            color: #10b981;
+            font-weight: bold;
+        }
+
+        .confirmation-email span {
+            color: #065f46;
+            font-size: 14px;
+        }
+
+        .modal-footer {
+            padding: 0 40px 32px 40px;
+        }
+
+        .modal-close-btn {
+            width: 100%;
+            padding: 14px 24px;
+            background: #e5e7eb;
+            color: #374151;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .modal-close-btn:hover {
+            background: #d1d5db;
+        }
+
+        @media (max-width: 640px) {
+            .confirmation-modal {
+                width: 95%;
+                margin: 20px;
+            }
+            
+            .modal-header,
+            .modal-body,
+            .modal-footer {
+                padding-left: 24px;
+                padding-right: 24px;
+            }
+            
+            .modal-title {
+                font-size: 24px;
+            }
+        }
+
+
+        /* Home Button Styles */
+        .nav-section {
+            flex: 0 0 auto;
+        }
+
+        .nav-spacer {
+            flex: 0 0 auto;
+            width: 120px; /* Same width as home button to balance */
+        }
+
+        .home-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            text-decoration: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .home-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-1px);
+        }
+
+        .home-icon {
+            font-size: 18px;
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                justify-content: space-between;
+            }
+            
+            .nav-spacer {
+                display: none;
+            }
+            
+            .home-btn span:not(.home-icon) {
+                display: none;
+            }
+            
+            .home-btn {
+                padding: 8px 12px;
+            }
+        }
+
     </style>
 </head>
 <body>
     <!-- Top Header with Logo and Company Name -->
     <header class="top-header">
         <div class="header-content">
+            <div class="nav-section">
+                <a href="https://uniquepathlab.netlify.app" class="home-btn">
+                    <span class="home-icon">🏠</span>
+                    <span>Home</span>
+                </a>
+            </div>
             <div class="logo-container">
                 <div class="logo-icon">
                     🔬
@@ -633,6 +958,7 @@
                     <div class="company-tagline">Booking of Unique Path Lab</div>
                 </div>
             </div>
+            <div class="nav-spacer"></div>
         </div>
     </header>
 
@@ -1028,30 +1354,12 @@
             const result = await response.json();
             
             if (response.ok && result.success) {
-                // Show success message
-                successMsg.innerHTML = `
-                    <strong>✅ Booking Confirmed!</strong><br>
-                    Your appointment has been booked successfully.<br>
-                    <strong>Booking ID:</strong> ${result.bookingId}<br>
-                    You will receive confirmation within 2 hours.
-                `;
-                successMsg.style.display = 'block';
-                
-                // Reset form AFTER success
-                setTimeout(() => {
-                    document.getElementById('bookingForm').reset();
-                    prescriptionImageData = null;
-                    document.getElementById('fileName').style.display = 'none';
-                    document.querySelectorAll('.test-item').forEach(item => {
-                        item.classList.remove('selected');
-                        item.querySelector('.test-checkbox').checked = false;
-                    });
-                }, 1000);
-                
-                successMsg.scrollIntoView({ behavior: 'smooth' });
+                // Show modal instead of inline message
+                showConfirmationModal(formData, result.bookingId);
             } else {
                 throw new Error(result.message || 'Booking failed');
             }
+
         } catch (error) {
             console.error('❌ Booking error:', error);
             showError('Failed to book appointment. Please try again or contact us at +91-79798-06128');
@@ -1105,6 +1413,39 @@
         };
     }
 
+    // Modal functions
+    function showConfirmationModal(formData, bookingId) {
+        const appointmentDate = new Date(formData.collectionDate);
+        document.getElementById('modalAppointmentDate').textContent = 
+            appointmentDate.toLocaleDateString('en-US', {
+                weekday: 'long',
+                year: 'numeric', 
+                month: 'long',
+                day: 'numeric'
+            });
+        
+        document.getElementById('modalTimeSlot').textContent = 
+            formData.timeSlot.charAt(0).toUpperCase() + formData.timeSlot.slice(1) + ' Slot';
+        
+        if (formData.emailAddress) {
+            document.getElementById('modalEmail').textContent = formData.emailAddress;
+        }
+        
+        document.getElementById('confirmationModal').classList.add('show');
+    }
+
+    function closeConfirmationModal() {
+        document.getElementById('confirmationModal').classList.remove('show');
+        document.getElementById('bookingForm').reset();
+        prescriptionImageData = null;
+        document.getElementById('fileName').style.display = 'none';
+        document.querySelectorAll('.test-item').forEach(item => {
+            item.classList.remove('selected');
+            item.querySelector('.test-checkbox').checked = false;
+        });
+    }
+
+
     function formatAddress() {
         const addressParts = [
             document.getElementById('houseNo').value.trim(),
@@ -1139,7 +1480,56 @@
     });
     </script>
 
+    <!-- Confirmation Modal -->
+    <div id="confirmationModal" class="modal-overlay">
+        <div class="confirmation-modal">
+            <button class="modal-close" onclick="closeConfirmationModal()">&times;</button>
+            
+            <div class="modal-header">
+                <div class="success-icon"></div>
+                <h2 class="modal-title">Booking Confirmed!</h2>
+                <p class="modal-subtitle">Your appointment request has been successfully submitted.</p>
+            </div>
+            
+            <div class="modal-body">
+                <div class="appointment-details">
+                    <h3>📅 Appointment Details</h3>
+                    <div class="appointment-info">
+                        <div id="modalAppointmentDate" class="appointment-date">Thursday, October 9th, 2025</div>
+                        <div id="modalTimeSlot" class="appointment-time">Afternoon Slot</div>
+                    </div>
+                </div>
+                
+                <div class="next-steps">
+                    <h3>🕐 What happens next?</h3>
+                    <ul class="steps-list">
+                        <li>Our team will contact you within 2 hours</li>
+                        <li>We'll confirm your exact appointment slot</li>
+                        <li>You'll receive test preparation instructions</li>
+                        <li>Doorstep sample collection as scheduled</li>
+                    </ul>
+                </div>
+                
+                <div class="contact-methods">
+                    <p>You'll be contacted via:</p>
+                    <div class="contact-icons">
+                        <div class="contact-method">💬 WhatsApp & Call</div>
+                        <div class="contact-method">📧 Email updates</div>
+                    </div>
+                </div>
+                
+                <div class="confirmation-email">
+                    <span class="check-icon">✅</span>
+                    <span>Confirmation email sent to <span id="modalEmail">mparwez05@gmail.com</span></span>
+                </div>
+            </div>
+            
+            <div class="modal-footer">
+                <button class="modal-close-btn" onclick="closeConfirmationModal()">Got it, thanks!</button>
+            </div>
+        </div>
+    </div>
+
 </body>
 </html>
-
 
